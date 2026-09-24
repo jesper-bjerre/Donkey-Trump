@@ -7,7 +7,6 @@ import { VirtualKeyboard } from '../input/virtualKeys.js';
 import { isPortrait } from '../input/deviceDetection.js';
 import { announce } from './announce.js';
 import { el } from './dom.js';
-import { enterFullscreen, exitFullscreen, getFullscreenSupport, isFullscreen } from './fullscreen.js';
 
 export const DPAD_ACTIONS = Object.freeze(['left', 'right', 'up', 'down']);
 const DEAD_ZONE = 0.22;
@@ -103,20 +102,6 @@ function HoldButton(keyboard, action, label, className) {
   return button;
 }
 
-// iPhone: explains how to get a true fullscreen web app via Add to Home Screen.
-function InstallTip(onClose) {
-  const copy = uiText.touch.install;
-  const close = el('button', { type: 'button', class: 'deck-button', 'data-action': 'close-install', text: copy.close, onClick: onClose });
-  return el('div', { class: 'install-tip', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'install-heading', hidden: '' }, [
-    el('div', { class: 'install-card' }, [
-      el('h2', { id: 'install-heading', text: copy.heading }),
-      el('p', { text: copy.intro }),
-      el('ol', {}, copy.steps.map((step) => el('li', { text: step }))),
-      close,
-    ]),
-  ]);
-}
-
 export function mountTouchControls({ doc = globalThis.document, keyboard = new VirtualKeyboard({ target: doc.defaultView }) } = {}) {
   const labels = uiText.touch.buttons;
   const host = doc.getElementById('game');
@@ -131,26 +116,6 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
     HoldButton(keyboard, 'pause', labels.pause, 'deck-button'),
     HoldButton(keyboard, 'mute', labels.sound, 'deck-button'),
   ];
-  const fullscreen = getFullscreenSupport(doc);
-  const installTip = InstallTip(() => {
-    installTip.hidden = true;
-  });
-  let fullscreenButton = null;
-  if (fullscreen.api || fullscreen.homeScreenOnly) {
-    fullscreenButton = el('button', {
-      type: 'button',
-      class: 'deck-button',
-      'data-action': 'fullscreen',
-      text: labels.fullscreen,
-      onClick: () => {
-        if (fullscreen.homeScreenOnly) installTip.hidden = false;
-        else if (isFullscreen(doc)) exitFullscreen(doc);
-        else enterFullscreen(doc);
-      },
-    });
-    systemButtons.push(fullscreenButton);
-  }
-
   const left = el('div', { class: 'deck deck-left', 'data-control': 'deck-left' }, DirectionPad(keyboard));
   const right = el('div', { class: 'deck deck-right', 'data-control': 'deck-right' }, [
     el('div', { class: 'deck-system' }, systemButtons),
@@ -165,13 +130,15 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
     el('span', { class: 'rotate-icon', 'aria-hidden': 'true' }),
     el('p', { text: uiText.touch.rotate }),
   ]);
-  handheld.after(rotate, installTip);
+  handheld.after(rotate);
 
   const win = doc.defaultView;
   let game = null;
   let wasPortrait = null;
-  let installTipShown = false;
   const applyOrientation = () => {
+    // iOS Safari's vh/dvh can include hidden toolbar space; size the layout from the
+    // real visible viewport so nothing is cut off (e.g. iPhone 13 landscape, 750x342).
+    doc.documentElement.style.setProperty('--app-height', `${win?.innerHeight ?? 0}px`);
     const portrait = isPortrait(win);
     rotate.hidden = !portrait;
     handheld.toggleAttribute('inert', portrait);
@@ -182,11 +149,6 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
         announce(uiText.touch.rotate, doc);
       } else {
         game?.resume?.();
-        // On iPhone, offer the Home Screen route to fullscreen once per visit.
-        if (fullscreen.homeScreenOnly && !installTipShown) {
-          installTipShown = true;
-          installTip.hidden = false;
-        }
       }
       wasPortrait = portrait;
     }
@@ -208,25 +170,6 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
   win?.screen?.orientation?.addEventListener?.('change', onRotate);
   applyOrientation();
 
-  // Where the Fullscreen API exists (Android, iPad), the first tap goes fullscreen
-  // and locks landscape; after that the player decides via the FULL SCREEN button.
-  let autoFullscreenTried = false;
-  handheld.addEventListener(
-    'pointerdown',
-    () => {
-      if (autoFullscreenTried || !fullscreen.api) return;
-      autoFullscreenTried = true;
-      enterFullscreen(doc);
-    },
-    { capture: true },
-  );
-  const syncFullscreenButton = () => {
-    fullscreenButton?.replaceChildren(isFullscreen(doc) ? labels.exitFullscreen : labels.fullscreen);
-    onRotate();
-  };
-  doc.addEventListener('fullscreenchange', syncFullscreenButton);
-  doc.addEventListener('webkitfullscreenchange', syncFullscreenButton);
-
   // Stop long-press menus and stray scrolling while playing.
   handheld.addEventListener('contextmenu', (event) => event.preventDefault());
   win?.addEventListener?.('blur', () => keyboard.releaseAll());
@@ -234,7 +177,6 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
   return {
     handheld,
     keyboard,
-    installTip,
     portraitQuery,
     applyOrientation,
     attachGame(nextGame) {

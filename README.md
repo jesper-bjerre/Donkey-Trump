@@ -30,7 +30,7 @@ Development builds also serve a release QA page at `http://localhost:5173/#/dev/
 | P or Escape | Pause menu (resume, restart, return to title, controls) |
 | Enter | Select, and play again after game over |
 
-On phones and tablets without a keyboard the game switches to a handheld layout, played in landscape: a D-pad on the left, and JUMP, START, PAUSE, SOUND and FULL SCREEN buttons on the right. Holding the device in portrait pauses the game and asks the player to turn it. On Android and iPad the first tap goes fullscreen and locks landscape. iPhone Safari doesn't allow fullscreen for web pages, so on iPhone the game shows how to use Add to Home Screen; launched from there it runs fullscreen as a web app (`public/manifest.webmanifest`). Add `?touch=1` to the URL to try the layout on a desktop.
+On phones and tablets without a keyboard the game switches to a handheld layout, played in landscape: a D-pad on the left, and JUMP, START, PAUSE, SOUND and FULL SCREEN buttons on the right. Holding the device in portrait pauses the game and asks the player to turn it. The layout sizes itself from the visible viewport height, so everything fits inside Safari on small phones such as the iPhone 13 (750×342 in landscape). Add `?touch=1` to the URL to try the layout on a desktop.
 
 ## Layout
 

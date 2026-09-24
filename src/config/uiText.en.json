@@ -109,21 +109,9 @@
       "start": "START",
       "pause": "PAUSE",
       "sound": "SOUND",
-      "fullscreen": "FULL SCREEN",
-      "jump": "JUMP",
-      "exitFullscreen": "EXIT FULL"
+      "jump": "JUMP"
     },
-    "accountFree": "No account needed. Just press START and play.",
-    "install": {
-      "heading": "Play in full screen",
-      "intro": "iPhone only allows full screen for games started from the Home Screen:",
-      "steps": [
-        "Tap the Share button in Safari's toolbar.",
-        "Choose “Add to Home Screen”, then tap Add.",
-        "Open Donkey Trump from your Home Screen. It starts in full screen."
-      ],
-      "close": "Play in Safari"
-    }
+    "accountFree": "No account needed. Just press START and play."
   },
   "intro": {
     "orderTitle": "EXECUTIVE ORDER",
