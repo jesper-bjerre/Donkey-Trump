@@ -71,6 +71,14 @@ describe('createPauseHelpState', () => {
     expect(cb.onReturnToTitle).toHaveBeenCalledOnce();
   });
 
+  it('lets JUMP confirm the selection, like a handheld A button', () => {
+    const cb = callbacks();
+    const state = createPauseHelpState(cb);
+    state.open();
+    state.handleInput(press('jumpPressed'));
+    expect(cb.onResume).toHaveBeenCalledOnce();
+  });
+
   it('ignores input while closed', () => {
     const cb = callbacks();
     const state = createPauseHelpState(cb);

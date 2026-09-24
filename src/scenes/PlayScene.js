@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import uiText from '../config/uiText.en.json';
+import { getControlCopy } from '../config/controlCopy.js';
 import { MAX_FALL_SPEED } from '../config/physics.js';
 import { getReducedMotionPreference } from '../config/playerSettings.js';
 import { UI_COLORS } from '../config/uiTheme.js';
@@ -201,7 +202,7 @@ export class PlayScene extends Phaser.Scene {
       this.pauseOverlay.update(input);
     } else if (currentState === GAME_STATES.GAME_OVER) {
       if (input.confirmPressed) this.playAgain();
-      else if (input.escapePressed) this.returnToTitle();
+      else if (input.escapePressed || input.pausePressed) this.returnToTitle();
     } else if (currentState === GAME_STATES.VICTORY) {
       if (input.confirmPressed || input.escapePressed) this.returnToTitle();
     }
@@ -290,8 +291,8 @@ export class PlayScene extends Phaser.Scene {
       this.sounds?.play('gameOver');
       this.overlay.show(uiText.gameOver.heading, [
         `${uiText.gameOver.finalScore}: ${snapshot.score}`,
-        uiText.gameOver.retry,
-        uiText.gameOver.title,
+        getControlCopy().gameOverRetry,
+        getControlCopy().gameOverTitle,
       ]);
       return;
     }
@@ -319,7 +320,7 @@ export class PlayScene extends Phaser.Scene {
       this.sounds?.stopMusic();
       this.sounds?.play('victory');
       trackAnalyticsEvent(ANALYTICS_EVENTS.VICTORY_COMPLETE, { level: snapshot.levelIndex + 1, lives: snapshot.lives, scoreBand: toScoreBand(snapshot.score) });
-      this.overlay.show(uiText.victory.heading, [uiText.victory.message, `${uiText.victory.finalScore}: ${snapshot.score}`, uiText.victory.replay]);
+      this.overlay.show(uiText.victory.heading, [uiText.victory.message, `${uiText.victory.finalScore}: ${snapshot.score}`, getControlCopy().victoryReplay]);
       return;
     }
     trackAnalyticsEvent(ANALYTICS_EVENTS.LEVEL_COMPLETE, { level: snapshot.levelIndex + 1, lives: snapshot.lives, scoreBand: toScoreBand(snapshot.score) });

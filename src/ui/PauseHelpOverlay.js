@@ -1,6 +1,7 @@
 // In-play pause menu with keyboard help. Owns only menu state and drawing;
 // PlayScene supplies callbacks for resume, restart and return-to-title.
 import uiText from '../config/uiText.en.json';
+import { getControlCopy } from '../config/controlCopy.js';
 import { getReducedMotionPreference } from '../config/playerSettings.js';
 import { FOCUS_MARKERS, UI_COLORS, toColorNumber } from '../config/uiTheme.js';
 import { announce } from './announce.js';
@@ -8,7 +9,7 @@ import { announce } from './announce.js';
 export const PAUSE_ACTIONS = Object.freeze(['resume', 'restart', 'returnToTitle']);
 
 export function getPauseHelpContent(text = uiText) {
-  const i = text.instructions;
+  const copy = getControlCopy(undefined, text);
   return {
     heading: text.pause.heading,
     actions: [
@@ -17,8 +18,8 @@ export function getPauseHelpContent(text = uiText) {
       { id: 'returnToTitle', label: text.pause.returnToTitle },
     ],
     helpHeading: text.pause.helpHeading,
-    helpLines: [i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute],
-    hint: text.pause.hint,
+    helpLines: copy.pauseHelpLines,
+    hint: copy.pauseHint,
   };
 }
 
@@ -72,7 +73,8 @@ export function createPauseHelpState({ onResume, onRestart, onReturnToTitle }) {
       }
       if (input.upPressed) state.selectPreviousAction();
       if (input.downPressed) state.selectNextAction();
-      if (input.confirmPressed) return state.activateSelectedAction();
+      // JUMP also confirms, like the A button on a handheld.
+      if (input.confirmPressed || input.jumpPressed) return state.activateSelectedAction();
       return null;
     },
   };

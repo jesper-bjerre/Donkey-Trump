@@ -30,6 +30,8 @@ Development builds also serve a release QA page at `http://localhost:5173/#/dev/
 | P or Escape | Pause menu (resume, restart, return to title, controls) |
 | Enter | Select, and play again after game over |
 
+On phones and tablets without a keyboard the game switches to a handheld layout, played in landscape: a D-pad on the left, and JUMP, START, PAUSE, SOUND and FULL SCREEN buttons on the right. Holding the device in portrait pauses the game and asks the player to turn it. Add `?touch=1` to the URL to try the layout on a desktop.
+
 ## Layout
 
 | Path | Responsibility |

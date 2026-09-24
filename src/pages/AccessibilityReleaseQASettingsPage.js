@@ -2,7 +2,7 @@
 // asset originality and analytics status. Reached only through devRoutes in dev builds.
 import { getReducedMotionOverride, getReducedMotionPreference, setReducedMotionOverride } from '../config/playerSettings.js';
 import { FOCUS_MARKERS, TEXT_CONTRAST_PAIRS } from '../config/uiTheme.js';
-import { SUPPORTED_DESKTOP_BROWSERS } from '../config/browserSupport.js';
+import { SUPPORTED_DESKTOP_BROWSERS, SUPPORTED_TOUCH_BROWSERS } from '../config/browserSupport.js';
 import { meetsWcagAA } from '../qa/contrast.js';
 import { AnalyticsDisabledChecklist } from '../ui/AnalyticsDisabledChecklist.js';
 import { AssetRegisterPanel } from '../ui/AssetRegisterPanel.js';
@@ -62,8 +62,10 @@ function KeyboardChecklist() {
 
 function BrowserPanel() {
   return el('section', { 'aria-labelledby': 'browser-heading' }, [
-    el('h2', { id: 'browser-heading', text: 'Supported desktop browsers' }),
+    el('h2', { id: 'browser-heading', text: 'Supported browsers' }),
     el('ul', {}, SUPPORTED_DESKTOP_BROWSERS.map((browser) => el('li', { text: `${browser.names.join(' / ')} (${browser.engine}): ${browser.versions.join(' and ')}` }))),
+    el('h3', { text: 'Touch devices (landscape, on-screen controls)' }),
+    el('ul', {}, SUPPORTED_TOUCH_BROWSERS.map((browser) => el('li', { text: `${browser.names.join(' / ')} (${browser.engine}): ${browser.versions.join(' and ')}` }))),
   ]);
 }
 

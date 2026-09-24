@@ -8,6 +8,12 @@ export const SUPPORTED_DESKTOP_BROWSERS = Object.freeze([
   { family: 'safari', names: ['Safari'], engine: 'WebKit', platforms: ['macOS'], versions: SUPPORTED_VERSION_POLICY },
 ]);
 
+// Phones and tablets play in landscape with on-screen controls (src/ui/TouchControls.js).
+export const SUPPORTED_TOUCH_BROWSERS = Object.freeze([
+  { family: 'safari-ios', names: ['Safari (iPhone, iPad)'], engine: 'WebKit', platforms: ['iOS', 'iPadOS'], versions: SUPPORTED_VERSION_POLICY, orientation: 'landscape' },
+  { family: 'chromium-android', names: ['Chrome (Android)'], engine: 'Blink', platforms: ['Android'], versions: SUPPORTED_VERSION_POLICY, orientation: 'landscape' },
+]);
+
 export const REQUIRED_BROWSER_CAPABILITIES = Object.freeze(['canvas-or-webgl', 'keyboard-events', 'es-modules']);
 
 export const REQUIRED_FAMILIES = Object.freeze(['chromium', 'firefox', 'safari']);

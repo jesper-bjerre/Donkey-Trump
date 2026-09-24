@@ -19,13 +19,15 @@ export function detectBootEnvironment(win = globalThis.window) {
   } catch {
     // A throwing probe means the capability is unavailable.
   }
-  return { canvas, webgl, keyboard: typeof win?.KeyboardEvent === 'function' };
+  const touch = Boolean(win && ('ontouchstart' in win || (win.navigator?.maxTouchPoints ?? 0) > 0));
+  return { canvas, webgl, keyboard: typeof win?.KeyboardEvent === 'function', touch };
 }
 
 export function checkBootCapabilities(environment) {
   const missing = [];
   if (!environment?.canvas && !environment?.webgl) missing.push('rendering');
-  if (!environment?.keyboard) missing.push('keyboard');
+  // A keyboard or a touch screen (on-screen controls) is enough to play.
+  if (!environment?.keyboard && !environment?.touch) missing.push('keyboard');
   return missing.length === 0
     ? { supported: true, reason: null, missing }
     : { supported: false, reason: RECOVERY_REASONS.UNSUPPORTED_BROWSER, missing };

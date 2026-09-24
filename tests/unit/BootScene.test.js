@@ -17,6 +17,11 @@ describe('checkBootCapabilities', () => {
     expect(checkBootCapabilities({ canvas: true, webgl: true, keyboard: false }).reason).toBe('unsupported-browser');
   });
 
+  it('accepts touch devices without a keyboard, but not devices with neither', () => {
+    expect(checkBootCapabilities({ canvas: true, webgl: true, keyboard: false, touch: true }).supported).toBe(true);
+    expect(checkBootCapabilities({ canvas: true, webgl: true, keyboard: false, touch: false }).reason).toBe('unsupported-browser');
+  });
+
   it('accepts Canvas-only or WebGL-only browsers with a keyboard', () => {
     expect(checkBootCapabilities({ canvas: true, webgl: false, keyboard: true }).supported).toBe(true);
     expect(checkBootCapabilities({ canvas: false, webgl: true, keyboard: true }).supported).toBe(true);

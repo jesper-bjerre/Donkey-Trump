@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import uiText from '../config/uiText.en.json';
+import { getControlCopy } from '../config/controlCopy.js';
 import { getSoundMuted, setSoundMuted } from '../config/playerSettings.js';
 import { FOCUS_MARKERS, UI_COLORS, toColorNumber } from '../config/uiTheme.js';
 import { announce } from '../ui/announce.js';
@@ -10,8 +11,8 @@ export function TitleStartPage(text = uiText) {
   return {
     title: text.title.gameTitle,
     tagline: text.title.tagline,
-    accountFree: text.title.accountFree,
-    hint: text.title.menuHint,
+    accountFree: getControlCopy().accountFree,
+    hint: getControlCopy().menuHint,
     parody: text.title.parody,
     actions: [
       { id: 'start', label: text.title.start },
@@ -26,7 +27,7 @@ export function InstructionsModal(text = uiText) {
   return {
     id: 'instructions',
     heading: i.heading,
-    lines: [i.goal, i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute, i.ladderNote],
+    lines: getControlCopy(undefined, text).instructionLines,
     closeHint: i.close,
   };
 }

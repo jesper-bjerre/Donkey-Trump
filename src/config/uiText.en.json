@@ -79,5 +79,38 @@
     "assetLoadFailure": "Some game files could not be loaded. Check your connection and reload the page.",
     "reload": "Press Enter to reload",
     "invalidLevelData": "This level could not be loaded. Please reload the page."
+  },
+  "touch": {
+    "help": "Touch game. D-pad to move and climb, JUMP to jump, START to select.",
+    "menuHint": "Tap an item, or use the D-pad and START",
+    "rotate": "Turn your device sideways to play Donkey Trump.",
+    "pauseHint": "D-pad to choose, START to select, PAUSE to resume",
+    "gameOverRetry": "Press START to play again",
+    "gameOverTitle": "Press PAUSE for the title screen",
+    "victoryReplay": "Press START to return to the title screen",
+    "instructions": [
+      "D-pad left and right: move",
+      "JUMP: jump over barrels",
+      "D-pad up and down: climb ladders (hold up mid-jump to grab one)",
+      "PAUSE: pause and resume",
+      "START: select, and play again after game over",
+      "SOUND: mute or unmute"
+    ],
+    "dpad": {
+      "label": "Direction pad",
+      "caption": "MOVE / CLIMB",
+      "left": "Move left",
+      "right": "Move right",
+      "up": "Climb up",
+      "down": "Climb down"
+    },
+    "buttons": {
+      "start": "START",
+      "pause": "PAUSE",
+      "sound": "SOUND",
+      "fullscreen": "FULL SCREEN",
+      "jump": "JUMP"
+    },
+    "accountFree": "No account needed. Just press START and play."
   }
 }

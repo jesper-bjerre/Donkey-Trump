@@ -1,8 +1,16 @@
 import './styles.css';
 import { bootstrapGame } from './GameBootstrap.js';
+import { setTouchMode, shouldUseTouchControls } from './input/deviceDetection.js';
+import { mountTouchControls } from './ui/TouchControls.js';
 
 function startGame() {
+  // Touch-only devices get the handheld layout with on-screen controls.
+  const touch = shouldUseTouchControls();
+  setTouchMode(touch);
+  // Wrap #game before Phaser boots so the canvas is sized for the handheld layout.
+  const controls = touch ? mountTouchControls() : null;
   const game = bootstrapGame();
+  controls?.attachGame(game);
   // Dev-only handle for local debugging and scripted playtests; stripped from production builds.
   if (import.meta.env.DEV) window.__DONKEY_TRUMP__ = game;
 }
