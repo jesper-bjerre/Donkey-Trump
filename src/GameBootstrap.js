@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene.js';
 import { TitleScene } from './scenes/TitleScene.js';
+import { IntroScene } from './scenes/IntroScene.js';
 import { PlayScene } from './scenes/PlayScene.js';
 import { WORLD_GRAVITY_Y } from './config/physics.js';
 
@@ -26,7 +27,7 @@ export function createGameConfig() {
         debug: false,
       },
     },
-    scene: [BootScene, TitleScene, PlayScene],
+    scene: [BootScene, TitleScene, IntroScene, PlayScene],
   };
 }
 

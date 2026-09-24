@@ -301,6 +301,20 @@
       "reviewer": null,
       "replacementOwner": "art-lead",
       "notes": "Original composition synthesized by scripts/generate-feedback-audio.mjs from pulse/triangle/noise oscillators; no samples and no transcription of existing games."
+    },
+    {
+      "id": "introAudio",
+      "runtimeKey": "jingle.intro.audio",
+      "displayName": "Intro march",
+      "type": "audio",
+      "intendedPath": "src/assets/audio/intro.wav",
+      "requiredForLaunch": false,
+      "originalityStatus": "original-placeholder",
+      "copiedAssetProhibited": true,
+      "reviewStatus": "needs-review",
+      "reviewer": null,
+      "replacementOwner": "art-lead",
+      "notes": "Original composition synthesized by scripts/generate-feedback-audio.mjs from pulse/triangle/noise oscillators; no samples and no transcription of existing games."
     }
   ]
 }

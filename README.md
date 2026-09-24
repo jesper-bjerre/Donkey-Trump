@@ -53,6 +53,15 @@ On phones and tablets without a keyboard the game switches to a handheld layout,
 | `src/routes/devRoutes.js`, `src/pages/` | Dev-only release QA page |
 | `scripts/` | Sprite sheet and sound generators, bundle report, license check, smoke test |
 
+## Intro
+
+Every new game opens with a roughly 13-second cutscene (`src/scenes/IntroScene.js`, choreography in `introTimeline.js`):
+1. The girders start flat. Donkey Trump carries Motzfeldt up the ladders and leaves her on the top platform.
+2. Back at his spot, he signs an **EXECUTIVE ORDER: ALL GIRDERS SLANTED**, and the girders tilt one by one into their slopes.
+3. A level card appears, then play begins.
+
+Enter, Space, Escape, START or a tap skips it. With reduced motion it shows only the final card. The march (`intro.wav`) is an original composition.
+
 ## Endless levels
 
 The three layouts repeat forever: 1, 2, 3, 1, 2, 3, … Every cleared level makes the barrels faster, spawns them more often and hurls more of them directly. After the first loop, difficulty ramps from the hardest layout, so each level is harder than the previous one. Every value approaches a fair limit (barrel speed 280 px/s, still clearable in one jump), so it rises forever without becoming impossible. Jumpman's own speed never changes. The run ends only at game over, which shows the level reached. The ramp lives in `src/levels/endless.js`; `new LevelManager(levels, { endless: false })` restores a finite run that ends in victory.

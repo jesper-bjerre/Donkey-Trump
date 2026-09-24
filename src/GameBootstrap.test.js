@@ -17,9 +17,9 @@ describe('createGameConfig', () => {
     expect(typeof config.height).toBe('number');
   });
 
-  it('registers BootScene, TitleScene and PlayScene in boot order', () => {
+  it('registers BootScene, TitleScene, IntroScene and PlayScene in boot order', () => {
     const keys = createGameConfig().scene.map((SceneClass) => new SceneClass().sys.settings.key);
-    expect(keys).toEqual(['BootScene', 'TitleScene', 'PlayScene']);
+    expect(keys).toEqual(['BootScene', 'TitleScene', 'IntroScene', 'PlayScene']);
   });
 });
 

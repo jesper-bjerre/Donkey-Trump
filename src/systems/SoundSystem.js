@@ -11,10 +11,11 @@ export const SOUND_KEYS = Object.freeze({
   levelStart: 'jingle.levelStart.audio',
   gameOver: 'jingle.gameOver.audio',
   victory: 'jingle.victory.audio',
+  intro: 'jingle.intro.audio',
   music: 'music.loop.audio',
 });
 
-const VOLUMES = { step: 0.25, jump: 0.45, score: 0.5, throw: 0.4, levelStart: 0.55, gameOver: 0.55, victory: 0.55 };
+const VOLUMES = { step: 0.25, jump: 0.45, score: 0.5, throw: 0.4, levelStart: 0.55, gameOver: 0.55, victory: 0.55, intro: 0.55 };
 export const MUSIC_VOLUME = 0.22;
 export const STEP_INTERVAL_MS = 170;
 // Later levels play the loop slightly faster to raise the tension.
@@ -50,6 +51,14 @@ export class SoundSystem {
       return this.manager.play(key, { volume: VOLUMES[name] ?? 0.5, ...config });
     } catch {
       return false;
+    }
+  }
+
+  stop(name) {
+    try {
+      this.manager?.stopByKey?.(SOUND_KEYS[name]);
+    } catch {
+      // Nothing playing.
     }
   }
 

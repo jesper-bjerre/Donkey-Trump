@@ -162,6 +162,24 @@ const sounds = {
     const hat = concat(...Array.from({ length: 8 }, () => concat(sweep(8000, 6000, 0.02, { wave: 'noise', volume: 0.12 }), new Array(Math.round(0.48 * RATE)).fill(0))));
     return mix(bass, lead, hat).slice(0, 4 * RATE);
   },
+
+  // Generated last: the noise generator is shared state, so adding sounds at the end
+  // keeps every earlier file byte-identical.
+  // Intro: a pompous mock-march in D major for the executive-order cutscene
+  // (original composition: rising fourths, a swagger turn, a tonic stamp).
+  'intro.wav': () =>
+    mix(
+      voice(
+        [['A4', 0.5], ['D5', 0.5], ['D5', 0.5], ['F#5', 0.5], ['E5', 1], ['A4', 1],
+         ['B4', 0.5], ['E5', 0.5], ['E5', 0.5], ['G5', 0.5], ['F#5', 0.5], ['E5', 0.5], ['D5', 2]],
+        { bpm: 200, duty: 0.25, volume: 0.28, release: 0.8 },
+      ),
+      voice(
+        [['D3', 1], ['A2', 1], ['D3', 1], ['A2', 1], ['G2', 1], ['E2', 1], ['A2', 1], ['D3', 2]],
+        { bpm: 200, wave: 'triangle', volume: 0.45 },
+      ),
+      concat(...Array.from({ length: 5 }, () => concat(sweep(160, 60, 0.08, { volume: 0.35, noiseMix: 0.4 }), new Array(Math.round(0.52 * RATE)).fill(0)))),
+    ),
 };
 
 if (import.meta.url === `file://${process.argv[1]}`) {

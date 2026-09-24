@@ -124,5 +124,13 @@
       ],
       "close": "Play in Safari"
     }
+  },
+  "intro": {
+    "orderTitle": "EXECUTIVE ORDER",
+    "orderText": "ALL GIRDERS SLANTED. EFFECTIVE IMMEDIATELY.",
+    "cardGoal": "Jumpman Løkke, rescue Motzfeldt!",
+    "skip": "Press Enter to skip",
+    "touchSkip": "Tap or press START to skip",
+    "announce": "Donkey Trump carries Motzfeldt to the top of the girders and signs an executive order that tilts every girder. Rescue her, Jumpman Løkke!"
   }
 }

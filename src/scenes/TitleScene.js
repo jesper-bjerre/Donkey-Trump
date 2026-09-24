@@ -147,7 +147,8 @@ export class TitleScene extends Phaser.Scene {
   create() {
     const { width, height } = this.scale;
     this.model = createTitleMenuModel({
-      onStart: () => this.scene.start('PlayScene'),
+      // A new game opens with the executive-order cutscene.
+      onStart: () => this.scene.start('IntroScene'),
       onChange: () => this.render(),
     });
     const page = this.model.page;

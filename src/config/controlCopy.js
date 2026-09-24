@@ -7,6 +7,7 @@ export function getControlCopy(touch = isTouchMode(), text = uiText) {
   if (touch) {
     return {
       accountFree: text.touch.accountFree,
+      introSkip: text.intro.touchSkip,
       menuHint: text.touch.menuHint,
       instructionLines: [i.goal, ...text.touch.instructions, i.ladderNote],
       pauseHelpLines: text.touch.instructions,
@@ -18,6 +19,7 @@ export function getControlCopy(touch = isTouchMode(), text = uiText) {
   }
   return {
     accountFree: text.title.accountFree,
+    introSkip: text.intro.skip,
     menuHint: text.title.menuHint,
     instructionLines: [i.goal, i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute, i.ladderNote],
     pauseHelpLines: [i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute],
