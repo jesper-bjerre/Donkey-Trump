@@ -41,6 +41,12 @@ describe('static-web-app workflow', () => {
     expect(workflow).toMatch(/output_location: dist/);
   });
 
+  it('deploys every push to main straight to production without an approval step', () => {
+    expect(workflow).toMatch(/deploy-production:[\s\S]*?github\.event_name == 'push' && github\.ref == 'refs\/heads\/main'/);
+    expect(workflow).not.toMatch(/tags: \[/);
+    expect(workflow).toMatch(/deploy-staging:\n[^\n]*\n\s+if: github\.event_name == 'workflow_dispatch' && inputs\.target == 'staging'/);
+  });
+
   it('gates deployment on validation and scanning, and production on an environment', () => {
     expect(workflow).toMatch(/build:\n[\s\S]*?needs: validate/);
     for (const job of ['deploy-preview', 'deploy-staging', 'deploy-production']) {
@@ -85,10 +91,11 @@ describe('static-web-app workflow', () => {
 });
 
 describe('rollback runbook', () => {
-  it('documents dispatch-based rollback to a previous artifact or tag', () => {
+  it('documents artifact redeploy and git revert rollback for continuous deployment', () => {
     expect(runbook).toContain('workflow_dispatch');
     expect(runbook).toMatch(/artifact_run_id/);
-    expect(runbook).toMatch(/previous tag/i);
+    expect(runbook).toMatch(/git revert/);
+    expect(runbook).toMatch(/Every push to `main` deploys to production automatically/);
     expect(runbook).toContain('Azure/static-web-apps-deploy');
   });
 

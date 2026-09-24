@@ -1,15 +1,15 @@
 # Validate, scan, build and deploy the static Phaser game to Azure Static Web Apps.
 #
 #   pull_request      -> validate + scan + build, deploy a PR preview environment
-#   push to main      -> validate + scan + build, deploy the "staging" environment
-#   tag v*            -> validate + scan + build, deploy production (approval-gated)
+#   push to main      -> validate + scan + build, deploy production directly (no
+#                        manual approval), then a fail-closed smoke test
 #   workflow_dispatch -> deploy staging or production from the selected ref, or
 #                        roll back by redeploying the artifact of an earlier run
 #
 # Required repository configuration (never commit real values):
 #   secrets.AZURE_STATIC_WEB_APPS_API_TOKEN  deployment token, scoped to this app, rotated every 90 days
 #   vars.PRODUCTION_URL / vars.STAGING_URL   base URLs used by smoke tests
-#   Environment "production" with required reviewers (the manual approval gate)
+#   Environment "production" restricted to the main branch (no required reviewers)
 # Rollback procedure: docs/production-smoke-and-rollback.md
 #
 # Supply chain: every action is pinned to a full commit SHA (tag in the trailing
@@ -23,7 +23,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       target:
@@ -173,9 +172,7 @@ jobs:
 
   deploy-staging:
     name: Deploy staging
-    if: >-
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      (github.event_name == 'workflow_dispatch' && inputs.target == 'staging')
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'staging'
     needs: [build, scan]
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -219,8 +216,9 @@ jobs:
 
   deploy-production:
     name: Deploy production
+    # Every push to main ships to production once validation, scanning and the build pass.
     if: >-
-      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_dispatch' && inputs.target == 'production')
     needs: [build, scan]
     runs-on: ubuntu-latest
@@ -228,7 +226,6 @@ jobs:
     concurrency:
       group: static-web-app-production
       cancel-in-progress: false
-    # Required reviewers on this environment are the manual production approval gate.
     environment:
       name: production
       url: ${{ vars.PRODUCTION_URL }}

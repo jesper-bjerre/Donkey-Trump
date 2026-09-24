@@ -70,12 +70,12 @@ Rules live in `src/state/ScoreLivesRules.js`, movement in `src/controllers/Playe
 
 It then deploys to Azure Static Web Apps:
 - Pull requests get a preview environment.
-- Pushes to `main` deploy to `staging`.
-- `v*` tags deploy to production, behind the `production` environment's approval gate, followed by a fail-closed smoke test.
+- **Every push to `main` deploys straight to production** (no manual approval), followed by a fail-closed smoke test.
+- The `staging` environment deploys only on a manual run (**Run workflow**, target `staging`).
 
 Every action is pinned to a full commit SHA and the gitleaks image to a digest; Dependabot proposes updates weekly.
 
-Before the first deploy, configure the secret `AZURE_STATIC_WEB_APPS_API_TOKEN`, the variables `PRODUCTION_URL` and `STAGING_URL`, and required reviewers on the `production` environment. Rollback steps are in [docs/production-smoke-and-rollback.md](docs/production-smoke-and-rollback.md). Security headers, the CSP and cache rules live in `staticwebapp.config.json`, which the build copies into `dist`.
+The repo needs the secret `AZURE_STATIC_WEB_APPS_API_TOKEN` and the variables `PRODUCTION_URL` and `STAGING_URL`. The `production` environment only accepts deployments from `main`. Rollback steps are in [docs/production-smoke-and-rollback.md](docs/production-smoke-and-rollback.md). Security headers, the CSP and cache rules live in `staticwebapp.config.json`, which the build copies into `dist`.
 
 ## Asset originality
 
