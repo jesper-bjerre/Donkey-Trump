@@ -15,7 +15,7 @@
     "left": "Left Arrow or A: move left",
     "right": "Right Arrow or D: move right",
     "jump": "Space: jump over barrels",
-    "up": "Up Arrow or W: climb up a ladder",
+    "up": "Up Arrow or W: climb up a ladder (hold it mid-jump to grab one)",
     "down": "Down Arrow or S: climb down a ladder",
     "pause": "P: pause the game",
     "resume": "P or Escape: resume while paused",

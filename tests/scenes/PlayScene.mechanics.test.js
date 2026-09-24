@@ -73,3 +73,27 @@ describe('PlayScene mechanics composition', () => {
     expect(feet(scene)).toBeCloseTo(fx.playerSpawn.y, 0);
   });
 });
+
+describe('jumping onto a ladder', () => {
+  it('catches the ladder mid-jump when up is held and climbs on from there to the floor above', () => {
+    // Stand just left of the ladder, jump right into it, and hold up at the top of the arc.
+    const scene = makeScene({ x: 540, y: 571.9 });
+    const start = feet(scene);
+    frame(scene, { ...none, right: true, jumpPressed: true, jumpHeld: true });
+    let grabbedAt = null;
+    for (let i = 0; i < 60 && grabbedAt === null; i++) {
+      const rising = scene.player.body.velocity.y < 0;
+      frame(scene, { ...none, right: true, jumpHeld: true, up: !rising });
+      if (scene.ladderSystem.isClimbing) grabbedAt = feet(scene);
+    }
+    expect(grabbedAt).not.toBeNull();
+    expect(grabbedAt).toBeLessThan(start - 10);
+    // No falling back down after the grab.
+    frame(scene, none);
+    expect(feet(scene)).toBeCloseTo(grabbedAt, 5);
+    for (let i = 0; i < 90 && scene.ladderSystem.isClimbing; i++) frame(scene, { ...none, up: true });
+    settle(scene);
+    expect(feet(scene)).toBeCloseTo(fx.ladders[0].y, 1);
+    expect(scene.playerController.isGrounded()).toBe(true);
+  });
+});

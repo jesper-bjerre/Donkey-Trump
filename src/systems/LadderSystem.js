@@ -1,5 +1,6 @@
 // Ladders are overlap zones, not platforms. Climbing starts only while overlapping
-// a ladder and pressing up/down, suspends gravity, and ends at either end, when
+// a ladder and pressing up/down (also mid-jump: the player grabs the ladder where
+// he is instead of falling), suspends gravity, and ends at either end, when
 // jumping, or when the player leaves the zone.
 import { getBodyBounds, getBodyCenterX, placeBodyBottom, placeBodyCenterX } from './bodyPlacement.js';
 
@@ -9,6 +10,8 @@ export const DEFAULT_LADDER_SETTINGS = {
   // Vertical slack so a player standing exactly on a ladder's top or bottom still overlaps it.
   exitPaddingPx: 6,
   horizontalLock: true,
+  // Holding up/down while airborne over a ladder grabs it at the current height.
+  grabMidAir: true,
 };
 
 // Feet within this distance of a ladder end count as being at that end.
@@ -89,7 +92,8 @@ export class LadderSystem {
 
   shouldEnter(ladder, input) {
     if (!input.up && !input.down) return false;
-    if (this.controller.isGrounded && !this.controller.isGrounded()) return false;
+    const airborne = this.controller.isGrounded ? !this.controller.isGrounded() : false;
+    if (airborne && !this.settings.grabMidAir) return false;
     const feet = this.player.body.y + this.player.body.height;
     // Up is meaningless at the top, down is meaningless at the bottom.
     if (input.up) return feet > ladder.y + END_EPSILON_PX;

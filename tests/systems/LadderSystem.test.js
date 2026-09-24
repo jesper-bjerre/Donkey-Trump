@@ -123,3 +123,39 @@ describe('climbing', () => {
     expect(player.body.setAllowGravity).toHaveBeenLastCalledWith(true);
   });
 });
+
+describe('grabbing a ladder mid-jump', () => {
+  const midJump = { centerX: 104, bottom: 160, blockedDown: false, velocity: { x: 120, y: 80 } };
+
+  it('grabs the ladder at the current height when up is held while airborne', () => {
+    const { ladders, player, controller } = setup(midJump);
+    controller.handleJump(0);
+    expect(controller.isGrounded()).toBe(false);
+    ladders.update(fx.input.up);
+    expect(ladders.isClimbing).toBe(true);
+    expect(feetOf(player)).toBe(160);
+    expect(player.body.velocity.y).toBe(0);
+    expect(player.body.setAllowGravity).toHaveBeenLastCalledWith(false);
+  });
+
+  it('continues climbing up from the grab point', () => {
+    const { ladders, player } = setup(midJump);
+    ladders.update(fx.input.up);
+    ladders.update(fx.input.up);
+    expect(player.body.velocity.y).toBe(-DEFAULT_LADDER_SETTINGS.climbSpeed);
+  });
+
+  it('does not grab when neither up nor down is held, so jumps past ladders stay free', () => {
+    const { ladders } = setup(midJump);
+    ladders.update(fx.input.none);
+    expect(ladders.isClimbing).toBe(false);
+  });
+
+  it('can be switched off with grabMidAir: false', () => {
+    const player = createFakeSprite(midJump);
+    const controller = new PlayerController(player);
+    const ladders = new LadderSystem({ player, controller, ladders: fx.ladders, settings: { grabMidAir: false } });
+    ladders.update(fx.input.up);
+    expect(ladders.isClimbing).toBe(false);
+  });
+});
