@@ -120,8 +120,13 @@ html.touch-mode body {
 }
 
 html.touch-mode .shell {
+  box-sizing: border-box;
+  height: 100dvh;
+  min-height: 0;
+  /* Keeps controls clear of the notch and home indicator, e.g. in Home Screen fullscreen. */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   gap: 0;
+  background: #8f3b12;
 }
 
 /* Touch players never move keyboard focus to the canvas, so its focus ring is only noise. */
@@ -138,19 +143,19 @@ html.touch-mode .shell-help {
 }
 
 .handheld {
-  --deck-width: clamp(140px, 22vw, 240px);
+  --deck-width: clamp(118px, 18vw, 240px);
   --plastic: #c2551f;
   --plastic-dark: #8f3b12;
   --plate: #efe3c8;
   --ink: #2b1a10;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: var(--deck-width) 1fr var(--deck-width);
+  grid-template-columns: var(--deck-width) minmax(0, 1fr) var(--deck-width);
   align-items: center;
-  width: 100vw;
-  height: 100dvh;
-  padding: 10px;
-  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  gap: 6px;
   background: linear-gradient(160deg, var(--plastic), var(--plastic-dark));
 }
 
@@ -158,17 +163,20 @@ html.touch-mode .shell-help {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   height: 100%;
   min-width: 0;
-  padding: 8px;
-  border-radius: 14px;
+  padding: 4px;
+  border-radius: 12px;
+  container-type: size;
   background: #1a1410;
   box-shadow: inset 0 0 0 3px #4a2c18, 0 3px 0 rgb(0 0 0 / 30%);
 }
 
+/* Largest 4:3 box that fits the screen area, whichever side limits it. */
 html.touch-mode .game-host {
-  width: auto;
-  height: min(100%, calc((100vw - 2 * var(--deck-width) - 56px) * 0.75));
+  width: min(100cqw, calc(100cqh * 4 / 3));
+  height: auto;
   aspect-ratio: 4 / 3;
   touch-action: none;
 }
@@ -178,9 +186,9 @@ html.touch-mode .game-host {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   height: 100%;
-  padding: 12px 6px;
+  padding: 8px 4px;
   box-sizing: border-box;
   border-radius: 14px;
   background: var(--plate);
@@ -196,7 +204,7 @@ html.touch-mode .game-host {
 }
 
 .dpad {
-  --size: min(calc(var(--deck-width) - 24px), 62dvh, 170px);
+  --size: min(calc(var(--deck-width) - 16px), 58dvh, 170px);
   --arm: calc(var(--size) / 3);
   position: relative;
   width: var(--size);
@@ -248,15 +256,15 @@ html.touch-mode .game-host {
 .deck-system {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   align-items: center;
 }
 
 .deck-button {
-  min-width: 96px;
+  min-width: min(96px, calc(var(--deck-width, 118px) - 16px));
   min-height: 44px;
-  padding: 6px 14px;
+  padding: 6px 10px;
   border: 0;
   border-radius: 999px;
   background: #3b2a20;
@@ -268,7 +276,7 @@ html.touch-mode .game-host {
 }
 
 .jump-button {
-  width: min(calc(var(--deck-width) - 48px), 34dvh, 120px);
+  width: min(calc(var(--deck-width) - 28px), 32dvh, 120px);
   aspect-ratio: 1;
   border: 0;
   border-radius: 50%;
@@ -327,4 +335,41 @@ html.touch-mode .game-host {
 
 @media (prefers-reduced-motion: reduce) {
   .rotate-icon { animation: none; transform: rotate(-90deg); }
+}
+
+.install-tip {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(11 11 20 / 85%);
+}
+
+.install-tip[hidden] {
+  display: none;
+}
+
+.install-card {
+  max-width: 460px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: #efe3c8;
+  color: #2b1a10;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.install-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+
+.install-card ol {
+  margin: 8px 0 14px;
+  padding-left: 1.3rem;
 }

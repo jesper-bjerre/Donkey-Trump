@@ -5,10 +5,17 @@ import { getControlCopy } from '../../src/config/controlCopy.js';
 let portrait = false;
 let orientationListener = null;
 
+// Sets the viewport like a phone being turned; isPortrait reads these first.
+function setViewport(width, height) {
+  Object.defineProperty(window, 'innerWidth', { value: width, configurable: true });
+  Object.defineProperty(window, 'innerHeight', { value: height, configurable: true });
+}
+
 beforeEach(() => {
   document.body.innerHTML = '<main class="shell"><div id="game"></div><p id="game-help">Keyboard help</p><div id="sr-status"></div></main>';
   document.documentElement.className = '';
   portrait = false;
+  setViewport(844, 390);
   vi.stubGlobal('matchMedia', (query) => ({
     get matches() {
       return query === '(orientation: portrait)' && portrait;
@@ -82,20 +89,58 @@ describe('mountTouchControls', () => {
   it('pauses the game in portrait and resumes it in landscape', () => {
     const keyboard = fakeKeyboard();
     const controls = mountTouchControls({ keyboard });
-    const game = { pause: vi.fn(), resume: vi.fn() };
+    const game = { pause: vi.fn(), resume: vi.fn(), scale: { refresh: vi.fn() } };
     controls.attachGame(game);
     const hint = document.querySelector('.rotate-hint');
     expect(hint.hidden).toBe(true);
-    portrait = true;
+    setViewport(390, 844);
     orientationListener();
     expect(hint.hidden).toBe(false);
     expect(game.pause).toHaveBeenCalled();
     expect(keyboard.releaseAll).toHaveBeenCalled();
     expect(controls.handheld.hasAttribute('inert')).toBe(true);
-    portrait = false;
+    setViewport(844, 390);
     orientationListener();
     expect(hint.hidden).toBe(true);
     expect(game.resume).toHaveBeenCalled();
+    expect(game.scale.refresh).toHaveBeenCalled();
+  });
+
+  it('notices rotation from resize and orientationchange, not only the media query', () => {
+    const controls = mountTouchControls({ keyboard: fakeKeyboard() });
+    const game = { pause: vi.fn(), resume: vi.fn() };
+    controls.attachGame(game);
+    const hint = document.querySelector('.rotate-hint');
+    setViewport(390, 844);
+    window.dispatchEvent(new Event('resize'));
+    expect(hint.hidden).toBe(false);
+    setViewport(844, 390);
+    window.dispatchEvent(new Event('orientationchange'));
+    expect(hint.hidden).toBe(true);
+    expect(game.resume).toHaveBeenCalled();
+  });
+
+  it('pauses a game attached while the page is already in portrait', () => {
+    setViewport(390, 844);
+    const controls = mountTouchControls({ keyboard: fakeKeyboard() });
+    const game = { pause: vi.fn(), resume: vi.fn() };
+    controls.attachGame(game);
+    expect(game.pause).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the orientation media query referenced so Safari cannot drop its listener', () => {
+    const controls = mountTouchControls({ keyboard: fakeKeyboard() });
+    expect(controls.portraitQuery).toBeDefined();
+  });
+
+  it('pauses only on the change into portrait, not on every resize', () => {
+    const controls = mountTouchControls({ keyboard: fakeKeyboard() });
+    const game = { pause: vi.fn(), resume: vi.fn() };
+    controls.attachGame(game);
+    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('resize'));
+    expect(game.resume).toHaveBeenCalledTimes(1);
+    expect(game.pause).not.toHaveBeenCalled();
   });
 });
 

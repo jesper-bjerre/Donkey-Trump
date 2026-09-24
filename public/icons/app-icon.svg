@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Original Donkey Trump app icon: rolling barrel on a red girder. -->
+  <rect width="512" height="512" fill="#0b0b14"/>
+  <path d="M40 388 L472 356 L472 392 L40 424 Z" fill="#d1344b"/>
+  <path d="M40 406 L88 372 L136 400 L184 366 L232 394 L280 360 L328 388 L376 354 L424 382 L472 350" fill="none" stroke="#7a1022" stroke-width="8"/>
+  <g transform="translate(256 236)">
+    <circle r="132" fill="#9b6531" stroke="#4a2c12" stroke-width="16"/>
+    <circle r="84" fill="none" stroke="#c9d1d9" stroke-width="18"/>
+    <path d="M0 -118 V118 M-118 0 H118" stroke="#6b421d" stroke-width="20" transform="rotate(22)"/>
+    <circle r="22" fill="#4a2c12"/>
+  </g>
+</svg>

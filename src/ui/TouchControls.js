@@ -7,6 +7,7 @@ import { VirtualKeyboard } from '../input/virtualKeys.js';
 import { isPortrait } from '../input/deviceDetection.js';
 import { announce } from './announce.js';
 import { el } from './dom.js';
+import { enterFullscreen, exitFullscreen, getFullscreenSupport, isFullscreen } from './fullscreen.js';
 
 export const DPAD_ACTIONS = Object.freeze(['left', 'right', 'up', 'down']);
 const DEAD_ZONE = 0.22;
@@ -102,14 +103,18 @@ function HoldButton(keyboard, action, label, className) {
   return button;
 }
 
-function requestLandscapeFullscreen(doc) {
-  const root = doc.documentElement;
-  if (!root.requestFullscreen) return Promise.resolve(false);
-  return root
-    .requestFullscreen({ navigationUI: 'hide' })
-    .then(() => doc.defaultView?.screen?.orientation?.lock?.('landscape'))
-    .then(() => true)
-    .catch(() => false);
+// iPhone: explains how to get a true fullscreen web app via Add to Home Screen.
+function InstallTip(onClose) {
+  const copy = uiText.touch.install;
+  const close = el('button', { type: 'button', class: 'deck-button', 'data-action': 'close-install', text: copy.close, onClick: onClose });
+  return el('div', { class: 'install-tip', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'install-heading', hidden: '' }, [
+    el('div', { class: 'install-card' }, [
+      el('h2', { id: 'install-heading', text: copy.heading }),
+      el('p', { text: copy.intro }),
+      el('ol', {}, copy.steps.map((step) => el('li', { text: step }))),
+      close,
+    ]),
+  ]);
 }
 
 export function mountTouchControls({ doc = globalThis.document, keyboard = new VirtualKeyboard({ target: doc.defaultView }) } = {}) {
@@ -126,10 +131,24 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
     HoldButton(keyboard, 'pause', labels.pause, 'deck-button'),
     HoldButton(keyboard, 'mute', labels.sound, 'deck-button'),
   ];
-  if (doc.fullscreenEnabled) {
-    systemButtons.push(
-      el('button', { type: 'button', class: 'deck-button', 'data-action': 'fullscreen', text: labels.fullscreen, onClick: () => requestLandscapeFullscreen(doc) }),
-    );
+  const fullscreen = getFullscreenSupport(doc);
+  const installTip = InstallTip(() => {
+    installTip.hidden = true;
+  });
+  let fullscreenButton = null;
+  if (fullscreen.api || fullscreen.homeScreenOnly) {
+    fullscreenButton = el('button', {
+      type: 'button',
+      class: 'deck-button',
+      'data-action': 'fullscreen',
+      text: labels.fullscreen,
+      onClick: () => {
+        if (fullscreen.homeScreenOnly) installTip.hidden = false;
+        else if (isFullscreen(doc)) exitFullscreen(doc);
+        else enterFullscreen(doc);
+      },
+    });
+    systemButtons.push(fullscreenButton);
   }
 
   const left = el('div', { class: 'deck deck-left', 'data-control': 'deck-left' }, DirectionPad(keyboard));
@@ -146,24 +165,67 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
     el('span', { class: 'rotate-icon', 'aria-hidden': 'true' }),
     el('p', { text: uiText.touch.rotate }),
   ]);
-  handheld.after(rotate);
+  handheld.after(rotate, installTip);
 
   const win = doc.defaultView;
   let game = null;
+  let wasPortrait = null;
+  let installTipShown = false;
   const applyOrientation = () => {
     const portrait = isPortrait(win);
     rotate.hidden = !portrait;
     handheld.toggleAttribute('inert', portrait);
-    if (portrait) {
-      keyboard.releaseAll();
-      game?.pause?.();
-      announce(uiText.touch.rotate, doc);
-    } else {
-      game?.resume?.();
+    if (portrait !== wasPortrait) {
+      if (portrait) {
+        keyboard.releaseAll();
+        game?.pause?.();
+        announce(uiText.touch.rotate, doc);
+      } else {
+        game?.resume?.();
+        // On iPhone, offer the Home Screen route to fullscreen once per visit.
+        if (fullscreen.homeScreenOnly && !installTipShown) {
+          installTipShown = true;
+          installTip.hidden = false;
+        }
+      }
+      wasPortrait = portrait;
     }
+    // The canvas container changed size; let Phaser re-fit the canvas.
+    game?.scale?.refresh?.();
   };
-  win?.matchMedia?.('(orientation: portrait)')?.addEventListener?.('change', applyOrientation);
+  // iOS Safari drops listeners of a MediaQueryList that gets garbage-collected, and
+  // reports the new viewport only after rotating finishes, so keep the query
+  // referenced, listen to every rotation signal, and re-check once things settle.
+  const onRotate = () => {
+    applyOrientation();
+    win?.setTimeout?.(applyOrientation, 350);
+  };
+  const portraitQuery = win?.matchMedia?.('(orientation: portrait)');
+  if (portraitQuery?.addEventListener) portraitQuery.addEventListener('change', onRotate);
+  else portraitQuery?.addListener?.(onRotate);
+  win?.addEventListener?.('resize', onRotate);
+  win?.addEventListener?.('orientationchange', onRotate);
+  win?.screen?.orientation?.addEventListener?.('change', onRotate);
   applyOrientation();
+
+  // Where the Fullscreen API exists (Android, iPad), the first tap goes fullscreen
+  // and locks landscape; after that the player decides via the FULL SCREEN button.
+  let autoFullscreenTried = false;
+  handheld.addEventListener(
+    'pointerdown',
+    () => {
+      if (autoFullscreenTried || !fullscreen.api) return;
+      autoFullscreenTried = true;
+      enterFullscreen(doc);
+    },
+    { capture: true },
+  );
+  const syncFullscreenButton = () => {
+    fullscreenButton?.replaceChildren(isFullscreen(doc) ? labels.exitFullscreen : labels.fullscreen);
+    onRotate();
+  };
+  doc.addEventListener('fullscreenchange', syncFullscreenButton);
+  doc.addEventListener('webkitfullscreenchange', syncFullscreenButton);
 
   // Stop long-press menus and stray scrolling while playing.
   handheld.addEventListener('contextmenu', (event) => event.preventDefault());
@@ -172,9 +234,13 @@ export function mountTouchControls({ doc = globalThis.document, keyboard = new V
   return {
     handheld,
     keyboard,
+    installTip,
+    portraitQuery,
     applyOrientation,
     attachGame(nextGame) {
       game = nextGame;
+      // Re-apply from scratch: the page may have opened in portrait before the game existed.
+      wasPortrait = null;
       applyOrientation();
     },
   };

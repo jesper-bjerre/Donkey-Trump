@@ -30,7 +30,11 @@
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{svg,png,ico,webp,json,txt,wav,ogg}"]
+    "exclude": [
+      "/assets/*",
+      "/*.{svg,png,ico,webp,json,txt,wav,ogg,webmanifest}",
+      "/icons/*"
+    ]
   },
   "responseOverrides": {
     "404": {
@@ -40,6 +44,7 @@
   },
   "mimeTypes": {
     ".wav": "audio/wav",
-    ".json": "application/json"
+    ".json": "application/json",
+    ".webmanifest": "application/manifest+json"
   }
 }

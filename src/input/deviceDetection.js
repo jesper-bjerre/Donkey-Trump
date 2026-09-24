@@ -21,7 +21,12 @@ export function shouldUseTouchControls(win = globalThis.window) {
   return hasTouchSupport(win) && matches(win, '(pointer: coarse)') && !matches(win, '(any-pointer: fine)');
 }
 
+// Compares the real viewport first: iOS Safari can report a stale orientation
+// media query right after rotating, while innerWidth/innerHeight are current.
 export function isPortrait(win = globalThis.window) {
+  const width = win?.innerWidth;
+  const height = win?.innerHeight;
+  if (width > 0 && height > 0) return height > width;
   return matches(win, '(orientation: portrait)');
 }
 
