@@ -10,6 +10,7 @@ export const KEY_BINDINGS = {
   confirm: ['ENTER'],
   pause: ['P'],
   escape: ['ESC'],
+  mute: ['M'],
 };
 
 export const EMPTY_INPUT = Object.freeze({
@@ -24,6 +25,7 @@ export const EMPTY_INPUT = Object.freeze({
   confirmPressed: false,
   pausePressed: false,
   escapePressed: false,
+  mutePressed: false,
 });
 
 export class InputMapper {
@@ -63,6 +65,7 @@ export class InputMapper {
       confirmPressed: this.wasPressed('confirm'),
       pausePressed: this.wasPressed('pause'),
       escapePressed: this.wasPressed('escape'),
+      mutePressed: this.wasPressed('mute'),
     };
     this.pressed.clear();
     return snapshot;

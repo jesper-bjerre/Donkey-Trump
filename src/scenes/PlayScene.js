@@ -15,12 +15,14 @@ import { SCORE_RULES } from '../state/ScoreLivesRules.js';
 import { BarrelSystem } from '../systems/BarrelSystem.js';
 import { CollisionSystem } from '../systems/CollisionSystem.js';
 import { FeedbackSystem } from '../systems/FeedbackSystem.js';
+import { SoundSystem } from '../systems/SoundSystem.js';
 import { HudSystem } from '../systems/HudSystem.js';
 import { LadderSystem } from '../systems/LadderSystem.js';
 import { ObjectiveSystem } from '../systems/ObjectiveSystem.js';
 import { resolveBodyToSlope } from '../systems/SlopeResolver.js';
 import { getBodyBounds, getBodyCenterX, placeBodyBottom } from '../systems/bodyPlacement.js';
 import { PauseHelpOverlay } from '../ui/PauseHelpOverlay.js';
+import { announce } from '../ui/announce.js';
 import { PlayOverlay } from '../ui/PlayOverlay.js';
 
 export const PLAY_TIMINGS = {
@@ -65,6 +67,10 @@ export class PlayScene extends Phaser.Scene {
       { reducedMotion: this.reducedMotion },
     );
     this.feedback = new FeedbackSystem(this, { reducedMotion: this.reducedMotion });
+    this.sounds = new SoundSystem(this);
+    // Phaser keeps sounds alive across scene changes, so stop the loop on exit.
+    this.events.once('shutdown', () => this.sounds.stopMusic());
+    this.hud.setSoundIndicator(this.sounds.muted ? uiText.hud.soundOff : '');
     this.stateMachine.subscribe((snapshot) => this.hud.updateFromState(snapshot));
 
     this.player = this.physics.add.sprite(0, 0, this.animated ? ANIMATION_SHEETS.player : 'player.jumpman').setDepth(10);
@@ -98,13 +104,16 @@ export class PlayScene extends Phaser.Scene {
 
   pauseWorld() {
     this.physics.pause();
+    this.sounds?.pauseMusic();
   }
 
   resumeWorld() {
     this.physics.resume();
+    this.sounds?.resumeMusic();
   }
 
-  loadLevel(index) {
+  // A retry reloads the same level quietly; a new level gets its jingle and music.
+  loadLevel(index, { retry = false } = {}) {
     this.level = this.levelManager.getLevel(index);
     this.buildLevel(this.level);
     this.ladderSystem.setLadders(this.level.ladders);
@@ -113,6 +122,10 @@ export class PlayScene extends Phaser.Scene {
     this.resetPlayer();
     const snapshot = this.stateMachine.getSnapshot();
     this.hud?.updateFromState(snapshot);
+    if (!retry) {
+      this.sounds?.startMusic(index);
+      this.sounds?.play('levelStart');
+    }
     trackAnalyticsEvent(ANALYTICS_EVENTS.LEVEL_START, {
       level: index + 1,
       lives: snapshot.lives,
@@ -149,7 +162,10 @@ export class PlayScene extends Phaser.Scene {
       level,
       getSpawnPoint: () => this.boss.getBarrelSpawnPoint(),
       createBarrelSprite: () => this.createBarrelSprite(level.barrels.spriteKey),
-      onSpawn: () => this.boss.playThrow(),
+      onSpawn: () => {
+        this.boss.playThrow();
+        this.sounds?.play('throw');
+      },
     });
   }
 
@@ -174,6 +190,7 @@ export class PlayScene extends Phaser.Scene {
   update(time, delta) {
     if (!this.stateMachine) return;
     const input = this.inputMapper.read();
+    if (input.mutePressed) this.toggleMute();
     this.trackFirstInput(input);
     const { currentState } = this.stateMachine.getSnapshot();
 
@@ -236,7 +253,9 @@ export class PlayScene extends Phaser.Scene {
   }
 
   stepPlay(input, time, delta) {
+    const wasJumping = this.playerController.state === 'jumping';
     this.stepMechanics(input, time);
+    this.playMovementSounds(wasJumping, time);
     this.updatePlayerAnimation();
     this.barrelSystem.update(delta);
 
@@ -245,6 +264,7 @@ export class PlayScene extends Phaser.Scene {
     const airborne = !this.playerController.isGrounded() && !this.ladderSystem.isClimbing;
     for (const barrel of this.collisionSystem.detectBarrelJumps(playerBounds, barrels, airborne)) {
       this.stateMachine.addScore(SCORE_RULES.barrelJumpPoints);
+      this.sounds?.play('score');
       this.floatText(barrel.sprite.x, barrel.sprite.y - 20, `+${SCORE_RULES.barrelJumpPoints}`);
     }
 
@@ -266,6 +286,8 @@ export class PlayScene extends Phaser.Scene {
     trackAnalyticsEvent(ANALYTICS_EVENTS.PLAYER_DEATH, { level: snapshot.levelIndex + 1, lives: snapshot.lives, cause: 'barrel' });
 
     if (snapshot.currentState === GAME_STATES.GAME_OVER) {
+      this.sounds?.stopMusic();
+      this.sounds?.play('gameOver');
       this.overlay.show(uiText.gameOver.heading, [
         `${uiText.gameOver.finalScore}: ${snapshot.score}`,
         uiText.gameOver.retry,
@@ -278,7 +300,7 @@ export class PlayScene extends Phaser.Scene {
       this.stateMachine.retryLevel();
       this.overlay.show(uiText.retry.retrying);
       this.schedule(PLAY_TIMINGS.retryMs, () => {
-        this.loadLevel(this.stateMachine.getSnapshot().levelIndex);
+        this.loadLevel(this.stateMachine.getSnapshot().levelIndex, { retry: true });
         this.stateMachine.startLevel();
         this.overlay.hide();
         this.resumeWorld();
@@ -294,6 +316,8 @@ export class PlayScene extends Phaser.Scene {
     this.feedback?.play('rescue', { rescue: this.rescueSprite });
 
     if (snapshot.currentState === GAME_STATES.VICTORY) {
+      this.sounds?.stopMusic();
+      this.sounds?.play('victory');
       trackAnalyticsEvent(ANALYTICS_EVENTS.VICTORY_COMPLETE, { level: snapshot.levelIndex + 1, lives: snapshot.lives, scoreBand: toScoreBand(snapshot.score) });
       this.overlay.show(uiText.victory.heading, [uiText.victory.message, `${uiText.victory.finalScore}: ${snapshot.score}`, uiText.victory.replay]);
       return;
@@ -338,6 +362,23 @@ export class PlayScene extends Phaser.Scene {
     this.loadLevel(0);
     this.overlay.hide();
     this.resumeWorld();
+  }
+
+  playMovementSounds(wasJumping, now) {
+    if (!this.sounds) return;
+    if (!wasJumping && this.playerController.state === 'jumping') this.sounds.play('jump');
+    const body = this.player.body;
+    const walking = this.playerController.isGrounded() && body.velocity.x !== 0;
+    const climbing = this.ladderSystem.isClimbing && body.velocity.y !== 0;
+    if (walking || climbing) this.sounds.playStep(now);
+  }
+
+  toggleMute() {
+    if (!this.sounds) return;
+    const muted = this.sounds.toggleMute();
+    const label = muted ? uiText.hud.soundOff : uiText.hud.soundOn;
+    this.hud?.setSoundIndicator?.(muted ? uiText.hud.soundOff : '');
+    announce(label);
   }
 
   returnToTitle() {

@@ -17,7 +17,7 @@ export function getPauseHelpContent(text = uiText) {
       { id: 'returnToTitle', label: text.pause.returnToTitle },
     ],
     helpHeading: text.pause.helpHeading,
-    helpLines: [i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry],
+    helpLines: [i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute],
     hint: text.pause.hint,
   };
 }
@@ -106,21 +106,21 @@ export class PauseHelpOverlay {
     const { scene, content } = this;
     const { width, height } = scene.scale;
     const font = { fontFamily: 'monospace' };
-    const panel = scene.add.rectangle(width / 2, height / 2, 600, 460, toColorNumber(UI_COLORS.panel), 0.96).setStrokeStyle(3, toColorNumber(UI_COLORS.accent));
-    const heading = scene.add.text(width / 2, height / 2 - 200, content.heading, { ...font, fontSize: '32px', color: UI_COLORS.accent }).setOrigin(0.5);
+    const panel = scene.add.rectangle(width / 2, height / 2, 600, 520, toColorNumber(UI_COLORS.panel), 0.96).setStrokeStyle(3, toColorNumber(UI_COLORS.accent));
+    const heading = scene.add.text(width / 2, height / 2 - 225, content.heading, { ...font, fontSize: '32px', color: UI_COLORS.accent }).setOrigin(0.5);
     this.actionTexts = content.actions.map((action, index) =>
-      scene.add.text(width / 2, height / 2 - 140 + index * 40, action.label, { ...font, fontSize: '22px', padding: { x: 10, y: 4 } }).setOrigin(0.5),
+      scene.add.text(width / 2, height / 2 - 165 + index * 40, action.label, { ...font, fontSize: '22px', padding: { x: 10, y: 4 } }).setOrigin(0.5),
     );
-    const helpHeading = scene.add.text(width / 2, height / 2 - 12, content.helpHeading, { ...font, fontSize: '18px', color: UI_COLORS.accent }).setOrigin(0.5);
+    const helpHeading = scene.add.text(width / 2, height / 2 - 38, content.helpHeading, { ...font, fontSize: '18px', color: UI_COLORS.accent }).setOrigin(0.5);
     const help = scene.add
-      .text(width / 2, height / 2 + 14, content.helpLines.join('\n'), { ...font, fontSize: '15px', color: UI_COLORS.text, align: 'left', lineSpacing: 3 })
+      .text(width / 2, height / 2 - 12, content.helpLines.join('\n'), { ...font, fontSize: '15px', color: UI_COLORS.text, align: 'left', lineSpacing: 3 })
       .setOrigin(0.5, 0);
-    this.hint = scene.add.text(width / 2, height / 2 + 205, content.hint, { ...font, fontSize: '14px', color: UI_COLORS.muted }).setOrigin(0.5);
+    this.hint = scene.add.text(width / 2, height / 2 + 235, content.hint, { ...font, fontSize: '14px', color: UI_COLORS.muted }).setOrigin(0.5);
     const children = [panel, heading, ...this.actionTexts, helpHeading, help, this.hint];
 
     // Decorative barrel rolling along the panel's bottom edge.
     if (this.presentation.previewAnimationClass && scene.textures?.exists('barrel.original')) {
-      this.preview = scene.add.image(width / 2 - 260, height / 2 + 180, 'barrel.original');
+      this.preview = scene.add.image(width / 2 - 260, height / 2 + 208, 'barrel.original');
       children.push(this.preview);
     }
     this.container = scene.add.container(0, 0, children).setDepth(300);

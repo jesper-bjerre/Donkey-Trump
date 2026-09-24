@@ -43,8 +43,15 @@ export class HudSystem {
       lives: scene.add.text(12, 36, '', TEXT_STYLE).setDepth(100),
       level: scene.add.text(scene.scale.width - 12, 8, '', TEXT_STYLE).setOrigin(1, 0).setDepth(100),
       message: scene.add.text(scene.scale.width - 12, 36, '', { ...TEXT_STYLE, fontSize: '16px', color: UI_COLORS.accent }).setOrigin(1, 0).setDepth(100),
+      sound: scene.add.text(scene.scale.width - 12, scene.scale.height - 12, '', { ...TEXT_STYLE, fontSize: '14px' }).setOrigin(1, 1).setDepth(100),
     };
     this.lastFormatted = null;
+  }
+
+  // Text rather than an icon, so the muted state is readable without color or symbols.
+  setSoundIndicator(label) {
+    this.texts.sound.setText(label);
+    this.texts.sound.setVisible(label !== '');
   }
 
   static createHud(scene) {
@@ -53,7 +60,7 @@ export class HudSystem {
 
   updateFromState(snapshot) {
     const formatted = formatHudState(snapshot);
-    for (const key of Object.keys(this.texts)) {
+    for (const key of Object.keys(formatted)) {
       if (this.lastFormatted?.[key] !== formatted[key]) this.texts[key].setText(formatted[key]);
     }
     this.lastFormatted = formatted;

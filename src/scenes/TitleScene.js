@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import uiText from '../config/uiText.en.json';
+import { getSoundMuted, setSoundMuted } from '../config/playerSettings.js';
 import { FOCUS_MARKERS, UI_COLORS, toColorNumber } from '../config/uiTheme.js';
 import { announce } from '../ui/announce.js';
 
@@ -25,7 +26,7 @@ export function InstructionsModal(text = uiText) {
   return {
     id: 'instructions',
     heading: i.heading,
-    lines: [i.goal, i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.ladderNote],
+    lines: [i.goal, i.left, i.right, i.jump, i.up, i.down, i.pause, i.resume, i.retry, i.mute, i.ladderNote],
     closeHint: i.close,
   };
 }
@@ -175,11 +176,20 @@ export class TitleScene extends Phaser.Scene {
     this.input.keyboard.on('keydown', (event) => {
       if (handled.has(event)) return;
       handled.add(event);
-      this.model.handleKey(event.key);
+      if (event.key === 'm' || event.key === 'M') this.toggleMute();
+      else this.model.handleKey(event.key);
     });
+    this.sound.mute = getSoundMuted();
     this.game.canvas?.setAttribute?.('tabindex', '0');
     this.game.canvas?.focus?.();
     this.render();
+  }
+
+  toggleMute() {
+    const muted = !getSoundMuted();
+    setSoundMuted(muted);
+    this.sound.mute = muted;
+    announce(muted ? uiText.hud.soundOff : uiText.hud.soundOn);
   }
 
   render() {

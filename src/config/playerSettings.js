@@ -29,3 +29,15 @@ export function getReducedMotionOverride() {
 export function getPlayerSettings(options) {
   return { reducedMotion: getReducedMotionPreference(options) };
 }
+
+// Sound mute, also memory-only. Starts unmuted each session.
+let soundMuted = false;
+
+export function getSoundMuted() {
+  return soundMuted;
+}
+
+export function setSoundMuted(muted) {
+  if (typeof muted !== 'boolean') throw new Error('Sound muted must be true or false.');
+  soundMuted = muted;
+}

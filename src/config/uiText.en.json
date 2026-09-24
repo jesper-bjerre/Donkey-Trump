@@ -20,6 +20,7 @@
     "pause": "P: pause the game",
     "resume": "P or Escape: resume while paused",
     "retry": "Enter: retry after game over",
+    "mute": "M: mute or unmute sound",
     "ladderNote": "You cannot jump from one floor to the next. Use the ladders.",
     "close": "Press Escape or Enter to close"
   },
@@ -35,7 +36,9 @@
     "score": "Score",
     "lives": "Lives",
     "level": "Level",
-    "objective": "Rescue Motzfeldt!"
+    "objective": "Rescue Motzfeldt!",
+    "soundOff": "Sound off (M)",
+    "soundOn": "Sound on"
   },
   "pause": {
     "heading": "Paused",
