@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { InstructionsModal, PrivacyModal, TitleStartPage, createTitleMenuModel } from '../../src/scenes/TitleScene.js';
+import { InstructionsModal, TitleStartPage, createTitleMenuModel } from '../../src/scenes/TitleScene.js';
 
 describe('title components', () => {
-  it('offers start, instructions and privacy actions with an account-free message', () => {
+  it('offers only start and instructions, with an account-free message', () => {
     const page = TitleStartPage();
     expect(page.title).toMatch(/DONKEY TRUMP/);
-    expect(page.actions.map((action) => action.id)).toEqual(['start', 'instructions', 'privacy']);
+    expect(page.actions.map((action) => action.id)).toEqual(['start', 'instructions']);
     expect(page.accountFree).toMatch(/no account/i);
   });
 
@@ -14,25 +14,23 @@ describe('title components', () => {
     for (const word of ['left', 'right', 'jump', 'up', 'down', 'pause', 'resume', 'retry']) expect(copy).toContain(word);
   });
 
-  it('PrivacyModal states the privacy posture', () => {
-    const copy = PrivacyModal().lines.join(' ').toLowerCase();
+  it('keeps the privacy promise as a line in How to Play', () => {
+    const copy = InstructionsModal().lines.join(' ').toLowerCase();
     expect(copy).toContain('no accounts');
-    expect(copy).toContain('no persistent profiles');
-    expect(copy).toContain('no third-party analytics');
+    expect(copy).toContain('no tracking');
   });
 });
 
 describe('createTitleMenuModel', () => {
-  it('opens and closes the instructions and privacy modals', () => {
+  it('opens and closes the instructions modal', () => {
     const model = createTitleMenuModel({ onStart: vi.fn() });
     model.openInstructions();
     expect(model.modal).toBe('instructions');
-    model.openPrivacy();
+    model.openInstructions();
     expect(model.modal).toBe('instructions');
     model.closeModal();
     expect(model.modal).toBeNull();
-    model.openPrivacy();
-    expect(model.modal).toBe('privacy');
+    model.openInstructions();
     model.handleKey('Escape');
     expect(model.modal).toBeNull();
   });
@@ -55,11 +53,15 @@ describe('createTitleMenuModel', () => {
     expect(onStart).not.toHaveBeenCalled();
   });
 
-  it('wraps focus with the arrow keys', () => {
+  it('wraps focus with all four arrow keys, since the menu is one row', () => {
     const model = createTitleMenuModel({ onStart: vi.fn() });
     model.handleKey('ArrowUp');
-    expect(model.selectedAction).toBe('privacy');
+    expect(model.selectedAction).toBe('instructions');
     model.handleKey('ArrowDown');
+    expect(model.selectedAction).toBe('start');
+    model.handleKey('ArrowRight');
+    expect(model.selectedAction).toBe('instructions');
+    model.handleKey('ArrowLeft');
     expect(model.selectedAction).toBe('start');
   });
 });

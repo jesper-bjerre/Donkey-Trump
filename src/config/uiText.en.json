@@ -4,9 +4,8 @@
     "tagline": "Climb. Dodge. Rescue Motzfeldt.",
     "start": "Start Game",
     "instructions": "How to Play",
-    "privacy": "Privacy",
     "accountFree": "No account needed. Just press Enter and play.",
-    "menuHint": "Up/Down to choose, Enter to select",
+    "menuHint": "Arrow keys to choose, Enter to select",
     "parody": "An original satirical parody. Not affiliated with any game publisher."
   },
   "instructions": {
@@ -22,15 +21,8 @@
     "retry": "Enter: retry after game over",
     "mute": "M: mute or unmute sound",
     "ladderNote": "You cannot jump from one floor to the next. Use the ladders.",
-    "close": "Press Escape or Enter to close"
-  },
-  "privacy": {
-    "heading": "Privacy",
-    "local": "The game runs entirely in your browser.",
-    "noAccounts": "There are no accounts and no persistent profiles.",
-    "noAnalytics": "There are no third-party analytics, and analytics transmission is disabled for this launch.",
-    "noStorage": "Your score is kept in memory only and is gone when you close the page.",
-    "close": "Press Escape or Enter to close"
+    "close": "Press Escape or Enter to close",
+    "privacy": "No accounts, no tracking: the game runs entirely in your browser."
   },
   "hud": {
     "score": "Score",

@@ -51,7 +51,7 @@ describe('WCAG 2.1 AA for non-gameplay UI', () => {
       reached.add(title.selectedAction);
       title.handleKey('ArrowDown');
     }
-    expect([...reached].sort()).toEqual(['instructions', 'privacy', 'start']);
+    expect([...reached].sort()).toEqual(['instructions', 'start']);
     title.handleKey('Enter');
     expect(onStart).toHaveBeenCalledOnce();
 

@@ -315,6 +315,20 @@
       "reviewer": null,
       "replacementOwner": "art-lead",
       "notes": "Original composition synthesized by scripts/generate-feedback-audio.mjs from pulse/triangle/noise oscillators; no samples and no transcription of existing games."
+    },
+    {
+      "id": "titleArt",
+      "runtimeKey": "title.art",
+      "displayName": "Title screen artwork",
+      "type": "image",
+      "intendedPath": "src/assets/sprites/title-screen.webp",
+      "requiredForLaunch": true,
+      "originalityStatus": "needs-review",
+      "copiedAssetProhibited": true,
+      "reviewStatus": "needs-review",
+      "reviewer": null,
+      "replacementOwner": "product-owner",
+      "notes": "Supplied by the product owner (AI-generated illustration), resized to 1600x900 WebP. Before launch, confirm usage rights for the generated image and that the satirical caricatures and girder scene do not reproduce protected game artwork."
     }
   ]
 }

@@ -148,6 +148,15 @@
       "frameCount": 3,
       "preload": true,
       "registerId": "rescue"
+    },
+    {
+      "key": "title.art",
+      "type": "image",
+      "path": "src/assets/sprites/title-screen.webp",
+      "width": 1600,
+      "height": 900,
+      "preload": true,
+      "registerId": "titleArt"
     }
   ],
   "audio": [

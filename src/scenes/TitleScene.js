@@ -17,7 +17,6 @@ export function TitleStartPage(text = uiText) {
     actions: [
       { id: 'start', label: text.title.start },
       { id: 'instructions', label: text.title.instructions },
-      { id: 'privacy', label: text.title.privacy },
     ],
   };
 }
@@ -32,17 +31,7 @@ export function InstructionsModal(text = uiText) {
   };
 }
 
-export function PrivacyModal(text = uiText) {
-  const p = text.privacy;
-  return {
-    id: 'privacy',
-    heading: p.heading,
-    lines: [p.local, p.noAccounts, p.noAnalytics, p.noStorage],
-    closeHint: p.close,
-  };
-}
-
-const MODALS = { instructions: InstructionsModal, privacy: PrivacyModal };
+const MODALS = { instructions: InstructionsModal };
 
 // Keyboard/pointer menu state. Only one modal can be open, and start fires once.
 export function createTitleMenuModel({ onStart, onChange = () => {} }) {
@@ -96,9 +85,6 @@ export function createTitleMenuModel({ onStart, onChange = () => {} }) {
     openInstructions() {
       model.openModal('instructions');
     },
-    openPrivacy() {
-      model.openModal('privacy');
-    },
     openModal(id) {
       if (modal) return;
       modal = id;
@@ -116,7 +102,6 @@ export function createTitleMenuModel({ onStart, onChange = () => {} }) {
     activate(actionId = model.selectedAction) {
       if (actionId === 'start') return model.requestStart();
       if (actionId === 'instructions') model.openInstructions();
-      if (actionId === 'privacy') model.openPrivacy();
       return true;
     },
     handleKey(key) {
@@ -124,8 +109,9 @@ export function createTitleMenuModel({ onStart, onChange = () => {} }) {
         if (key === 'Escape' || key === 'Enter' || key === ' ') model.closeModal();
         return;
       }
-      if (key === 'ArrowDown' || key === 's' || key === 'S') model.selectNext();
-      else if (key === 'ArrowUp' || key === 'w' || key === 'W') model.selectPrevious();
+      // The menu sits in one row under the artwork, so left/right navigate as well.
+      if (['ArrowDown', 'ArrowRight', 's', 'S', 'd', 'D'].includes(key)) model.selectNext();
+      else if (['ArrowUp', 'ArrowLeft', 'w', 'W', 'a', 'A'].includes(key)) model.selectPrevious();
       else if (key === 'Enter' || key === ' ') model.activate();
     },
   };
@@ -153,23 +139,30 @@ export class TitleScene extends Phaser.Scene {
     });
     const page = this.model.page;
 
-    this.add.text(width / 2, 70, page.title, { fontFamily: 'monospace', fontSize: '56px', color: UI_COLORS.title, stroke: '#000', strokeThickness: 6 }).setOrigin(0.5);
-    this.add.text(width / 2, 125, page.tagline, { fontFamily: 'monospace', fontSize: '20px', color: COLORS.text }).setOrigin(0.5);
-    if (this.textures.exists('boss.trumpInspired')) this.add.image(width - 150, 230, 'boss.trumpInspired').setScale(1.6);
-    if (this.textures.exists('player.jumpman')) this.add.image(150, 250, 'player.jumpman').setScale(2);
-    if (this.textures.exists('rescue.motzfeldt')) this.add.image(215, 243, 'rescue.motzfeldt').setScale(1.5);
+    // Title artwork across the full width (16:9, never cropped); the menu sits below it.
+    let menuTop = 250;
+    if (this.textures.exists('title.art')) {
+      const art = this.add.image(width / 2, 0, 'title.art').setOrigin(0.5, 0);
+      art.setScale(width / art.width);
+      menuTop = art.displayHeight;
+    } else {
+      this.add.text(width / 2, 90, page.title, { fontFamily: 'monospace', fontSize: '56px', color: UI_COLORS.title, stroke: '#000', strokeThickness: 6 }).setOrigin(0.5);
+      this.add.text(width / 2, 145, page.tagline, { fontFamily: 'monospace', fontSize: '20px', color: COLORS.text }).setOrigin(0.5);
+    }
 
+    const rowY = menuTop + 40;
+    const spacing = 300 / Math.max(1, page.actions.length - 1);
     this.buttons = page.actions.map((action, index) =>
       this.add
-        .text(width / 2, 240 + index * 56, action.label, { fontFamily: 'monospace', fontSize: '26px', padding: { x: 16, y: 6 } })
+        .text(width / 2 - 150 + index * spacing, rowY, action.label, { fontFamily: 'monospace', fontSize: '26px', padding: { x: 16, y: 6 } })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: true })
         .on('pointerover', () => this.model.select(action.id))
         .on('pointerdown', () => this.model.activate(action.id)),
     );
-    this.add.text(width / 2, 430, page.accountFree, { fontFamily: 'monospace', fontSize: '16px', color: COLORS.text }).setOrigin(0.5);
-    this.add.text(width / 2, 460, page.hint, { fontFamily: 'monospace', fontSize: '16px', color: COLORS.muted }).setOrigin(0.5);
-    this.add.text(width / 2, height - 24, page.parody, { fontFamily: 'monospace', fontSize: '13px', color: COLORS.muted }).setOrigin(0.5);
+    this.add.text(width / 2, rowY + 48, page.accountFree, { fontFamily: 'monospace', fontSize: '15px', color: COLORS.text }).setOrigin(0.5);
+    this.add.text(width / 2, rowY + 72, page.hint, { fontFamily: 'monospace', fontSize: '15px', color: COLORS.muted }).setOrigin(0.5);
+    this.add.text(width / 2, height - 12, page.parody, { fontFamily: 'monospace', fontSize: '12px', color: COLORS.muted }).setOrigin(0.5, 1);
 
     this.modalLayer = this.add.container(0, 0).setDepth(10);
     // Phaser can re-deliver queued DOM events when several keys land in one frame;
@@ -219,13 +212,13 @@ export class TitleScene extends Phaser.Scene {
     if (!content) return;
     const { width, height } = this.scale;
     const panel = this.add.rectangle(width / 2, height / 2, width - 80, height - 80, toColorNumber(UI_COLORS.panel), 0.97).setStrokeStyle(3, toColorNumber(UI_COLORS.accent));
-    const heading = this.add.text(width / 2, 70, content.heading, { fontFamily: 'monospace', fontSize: '30px', color: COLORS.accent }).setOrigin(0.5, 0);
-    const body = this.add.text(80, 125, content.lines.join('\n\n'), {
+    const heading = this.add.text(width / 2, 60, content.heading, { fontFamily: 'monospace', fontSize: '30px', color: COLORS.accent }).setOrigin(0.5, 0);
+    const body = this.add.text(70, 110, content.lines.join('\n'), {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: '15px',
       color: COLORS.text,
-      wordWrap: { width: width - 160 },
-      lineSpacing: 2,
+      wordWrap: { width: width - 140 },
+      lineSpacing: 9,
     });
     const close = this.add.text(width / 2, height - 70, content.closeHint, { fontFamily: 'monospace', fontSize: '16px', color: COLORS.accent }).setOrigin(0.5);
     this.modalLayer.add([panel, heading, body, close]);
