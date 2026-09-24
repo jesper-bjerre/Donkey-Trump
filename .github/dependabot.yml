@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Phaser 4 is a rewrite of the renderer and API; migrate deliberately, not via a bot bump.
+      - dependency-name: phaser
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:

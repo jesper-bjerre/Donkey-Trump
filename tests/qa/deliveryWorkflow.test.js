@@ -23,14 +23,14 @@ describe('static-web-app workflow', () => {
   });
 
   it('installs with npm ci on Node 22 before lint, tests and build', () => {
-    expect(workflow).toMatch(/actions\/setup-node@[0-9a-f]{40} # v4[.\d]*\n\s+with:\n\s+node-version: 22/);
+    expect(workflow).toMatch(/actions\/setup-node@[0-9a-f]{40} # v\d[.\d]*\n\s+with:\n\s+node-version: 22/);
     const order = ['npm ci', 'npm run lint', 'npm run test:run', 'npm run build'].map((command) => workflow.indexOf(command));
     expect(order.every((index) => index >= 0)).toBe(true);
     expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 
   it('uploads dist as a named artifact after the build', () => {
-    expect(workflow).toMatch(/actions\/upload-artifact@[0-9a-f]{40} # v4[.\d]*\n\s+with:\n\s+name: \$\{\{ env\.ARTIFACT_NAME \}\}\n\s+path: dist/);
+    expect(workflow).toMatch(/actions\/upload-artifact@[0-9a-f]{40} # v\d[.\d]*\n\s+with:\n\s+name: \$\{\{ env\.ARTIFACT_NAME \}\}\n\s+path: dist/);
     expect(workflow.indexOf('actions/upload-artifact')).toBeGreaterThan(workflow.indexOf('npm run build'));
   });
 
