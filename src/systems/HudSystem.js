@@ -18,11 +18,13 @@ const STATE_MESSAGES = {
 
 export function formatHudState(snapshot) {
   const level = toCount(snapshot?.levelIndex) + 1;
+  // Endless runs have no total, so show just the level number.
+  const endless = snapshot?.totalLevels === Infinity;
   const total = Math.max(level, toCount(snapshot?.totalLevels));
   return {
     score: `${uiText.hud.score}: ${toCount(snapshot?.score)}`,
     lives: `${uiText.hud.lives}: ${toCount(snapshot?.lives)}`,
-    level: `${uiText.hud.level} ${level}/${total}`,
+    level: endless ? `${uiText.hud.level} ${level}` : `${uiText.hud.level} ${level}/${total}`,
     message: STATE_MESSAGES[snapshot?.currentState] ?? '',
   };
 }

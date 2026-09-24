@@ -65,6 +65,7 @@ describe('SoundSystem', () => {
     expect(first.stop).toHaveBeenCalled();
     expect(scene.sound.add).toHaveBeenLastCalledWith(SOUND_KEYS.music, expect.objectContaining({ loop: true, rate: 1 + 2 * MUSIC_RATE_STEP }));
     expect(musicRateForLevel(0)).toBe(1);
+    expect(musicRateForLevel(200)).toBe(1.6);
   });
 
   it('pauses, resumes and stops the loop', () => {

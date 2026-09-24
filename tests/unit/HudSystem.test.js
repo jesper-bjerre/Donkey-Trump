@@ -18,6 +18,10 @@ describe('formatHudState', () => {
     expect(formatHudState(snapshots.corrupt)).toMatchObject({ score: 'Score: 0', lives: 'Lives: 0' });
   });
 
+  it('shows only the level number in endless mode', () => {
+    expect(formatHudState({ ...snapshots.play, levelIndex: 41, totalLevels: Infinity }).level).toBe('Level 42');
+  });
+
   it('shows a state message for outcomes', () => {
     expect(formatHudState(snapshots.levelComplete).message).toMatch(/rescued/i);
     expect(formatHudState(snapshots.victory).message).toMatch(/victory/i);

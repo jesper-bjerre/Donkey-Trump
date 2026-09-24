@@ -60,8 +60,8 @@ describe('validateLevelDefinition', () => {
 });
 
 describe('LevelManager', () => {
-  it('loads the default levels in order and marks the last as final', () => {
-    const manager = new LevelManager();
+  it('in finite mode loads the default levels in order and marks the last as final', () => {
+    const manager = new LevelManager(DEFAULT_LEVELS, { endless: false });
     expect(manager.count).toBe(DEFAULT_LEVELS.length);
     expect(manager.getLevel(0).id).toBe('level-1');
     expect(manager.isFinalLevel(2)).toBe(true);
@@ -74,7 +74,19 @@ describe('LevelManager', () => {
     expect(loaded).not.toBe(level1);
   });
 
-  it('throws for an unknown level index', () => {
-    expect(() => new LevelManager().getLevel(9)).toThrow(/Level 10/);
+  it('throws for an unknown level index in finite mode', () => {
+    expect(() => new LevelManager(DEFAULT_LEVELS, { endless: false }).getLevel(9)).toThrow(/Level 10/);
+    expect(() => new LevelManager().getLevel(-1)).toThrow();
+  });
+
+  it('is endless by default: layouts cycle forever and no level is final', () => {
+    const manager = new LevelManager();
+    expect(manager.count).toBe(Infinity);
+    expect(manager.layoutCount).toBe(3);
+    expect(manager.getLevel(3).girders).toEqual(manager.getLevel(0).girders);
+    expect(manager.getLevel(500).id).toBe('level-3-loop-167');
+    expect(manager.isFinalLevel(2)).toBe(false);
+    expect(manager.getLevel(2).rescue.isFinalLevel).toBe(false);
+    expect(Object.isFrozen(manager.getLevel(4).barrels)).toBe(true);
   });
 });

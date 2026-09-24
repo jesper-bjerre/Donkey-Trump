@@ -11,7 +11,7 @@
   },
   "instructions": {
     "heading": "How to Play",
-    "goal": "Climb the girders and reach Motzfeldt at the top. Dodge the barrels, and watch out: some are hurled straight at you!",
+    "goal": "Climb the girders and reach Motzfeldt at the top. The levels never end, and every rescue makes the barrels faster. Watch out: some are hurled straight at you!",
     "left": "Left Arrow or A: move left",
     "right": "Right Arrow or D: move right",
     "jump": "Space: jump over barrels",
@@ -56,11 +56,12 @@
     "heading": "GAME OVER",
     "finalScore": "Final score",
     "retry": "Press Enter to play again",
-    "title": "Press Escape for the title screen"
+    "title": "Press Escape for the title screen",
+    "levelReached": "Level reached"
   },
   "levelComplete": {
     "heading": "Motzfeldt rescued!",
-    "next": "Get ready for the next level..."
+    "next": "Get ready: the next level is faster..."
   },
   "victory": {
     "heading": "VICTORY!",

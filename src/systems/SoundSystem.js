@@ -19,9 +19,11 @@ export const MUSIC_VOLUME = 0.22;
 export const STEP_INTERVAL_MS = 170;
 // Later levels play the loop slightly faster to raise the tension.
 export const MUSIC_RATE_STEP = 0.08;
+// Endless levels keep speeding up, but the loop stops at a still-musical tempo.
+export const MAX_MUSIC_RATE = 1.6;
 
 export function musicRateForLevel(levelIndex) {
-  return 1 + Math.max(0, levelIndex) * MUSIC_RATE_STEP;
+  return Math.min(MAX_MUSIC_RATE, 1 + Math.max(0, levelIndex) * MUSIC_RATE_STEP);
 }
 
 export class SoundSystem {

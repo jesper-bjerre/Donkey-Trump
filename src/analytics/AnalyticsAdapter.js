@@ -15,7 +15,7 @@ const ALLOWED_EVENT_NAMES = new Set(Object.values(ANALYTICS_EVENTS));
 
 // Every permitted payload field with its validator. Anything else is stripped.
 const PAYLOAD_RULES = {
-  level: (value) => Number.isInteger(value) && value >= 1 && value <= 99,
+  level: (value) => Number.isInteger(value) && value >= 1 && value <= 9999,
   lives: (value) => Number.isInteger(value) && value >= 0 && value <= 99,
   scoreBand: (value) => typeof value === 'string' && /^\d{1,7}-\d{1,7}\+?$|^\d{1,7}\+$/.test(value),
   inputType: (value) => value === 'keyboard',

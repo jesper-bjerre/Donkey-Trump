@@ -53,6 +53,10 @@ On phones and tablets without a keyboard the game switches to a handheld layout,
 | `src/routes/devRoutes.js`, `src/pages/` | Dev-only release QA page |
 | `scripts/` | Sprite sheet and sound generators, bundle report, license check, smoke test |
 
+## Endless levels
+
+The three layouts repeat forever: 1, 2, 3, 1, 2, 3, … Every cleared level makes the barrels faster, spawns them more often and hurls more of them directly. After the first loop, difficulty ramps from the hardest layout, so each level is harder than the previous one. Every value approaches a fair limit (barrel speed 280 px/s, still clearable in one jump), so it rises forever without becoming impossible. Jumpman's own speed never changes. The run ends only at game over, which shows the level reached. The ramp lives in `src/levels/endless.js`; `new LevelManager(levels, { endless: false })` restores a finite run that ends in victory.
+
 ## Default tuning
 
 The defaults resolve open PRD questions and can be changed in config:

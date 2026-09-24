@@ -16,10 +16,11 @@ const { LadderSystem } = await import('../../src/systems/LadderSystem.js');
 // Fixture states: barrel overlapping the player, and the player standing in the rescue zone.
 const rescueBounds = (rescue) => ({ left: rescue.x + 10, right: rescue.x + 26, top: rescue.y + rescue.height - 30, bottom: rescue.y + rescue.height });
 
-function createProgressionScene() {
+function createProgressionScene({ endless = true } = {}) {
   const scene = new PlayScene();
-  scene.levelManager = new LevelManager();
+  scene.levelManager = new LevelManager(undefined, { endless });
   scene.stateMachine = createGameStateMachine({ totalLevels: scene.levelManager.count });
+  scene.hud = { updateFromState: vi.fn() };
   scene.objectiveSystem = new ObjectiveSystem({ rescue: null, stateMachine: scene.stateMachine });
   scene.collisionSystem = new CollisionSystem({ stateMachine: scene.stateMachine });
   scene.ladderSystem = new LadderSystem({ player: null, controller: null, ladders: [] });
@@ -71,8 +72,20 @@ describe('PlayScene progression', () => {
     expect(scene.resumeWorld).toHaveBeenCalled();
   });
 
-  it('shows victory after rescuing Motzfeldt on level 3', () => {
+  it('keeps going after level 3 in endless mode, with a faster level 4', () => {
     const scene = createProgressionScene();
+    rescue(scene);
+    rescue(scene);
+    const level3Speed = scene.level.barrels.speedMax;
+    const result = rescue(scene);
+    expect(result.currentState).toBe('level-complete');
+    expect(scene.stateMachine.getSnapshot()).toMatchObject({ currentState: 'play', levelIndex: 3 });
+    expect(scene.level.id).toBe('level-1-loop-2');
+    expect(scene.level.barrels.speedMax).toBeGreaterThan(level3Speed);
+  });
+
+  it('shows victory after rescuing Motzfeldt on level 3 in finite mode', () => {
+    const scene = createProgressionScene({ endless: false });
     rescue(scene);
     rescue(scene);
     expect(scene.level.id).toBe('level-3');

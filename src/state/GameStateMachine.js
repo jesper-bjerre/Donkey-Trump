@@ -24,8 +24,9 @@ export const GAME_STATES = Object.freeze({
 const S = GAME_STATES;
 
 export function createGameStateMachine({ totalLevels, initialLives = SCORE_RULES.startingLives } = {}) {
-  if (!Number.isInteger(totalLevels) || totalLevels < 1) {
-    throw new Error('GameStateMachine needs totalLevels >= 1.');
+  // Infinity means endless mode: every level is followed by another.
+  if (!(Number.isInteger(totalLevels) || totalLevels === Infinity) || totalLevels < 1) {
+    throw new Error('GameStateMachine needs totalLevels >= 1 (or Infinity for endless play).');
   }
   const listeners = new Set();
   let currentState = S.START;

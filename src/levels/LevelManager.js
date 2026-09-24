@@ -5,6 +5,7 @@ import level1 from './level1.json';
 import level2 from './level2.json';
 import level3 from './level3.json';
 import { validateAgainstSchema } from './schemaValidator.js';
+import { createEndlessLevel } from './endless.js';
 
 export const DEFAULT_LEVELS = [level1, level2, level3];
 
@@ -60,23 +61,33 @@ export function loadLevelDefinition(level) {
   return deepFreeze(structuredClone(level));
 }
 
+// Endless by default: layouts cycle forever with rising difficulty. Pass
+// { endless: false } for a finite run that ends with a victory on the last layout.
 export class LevelManager {
-  constructor(levels = DEFAULT_LEVELS) {
+  constructor(levels = DEFAULT_LEVELS, { endless = true } = {}) {
     this.levels = levels.map(loadLevelDefinition).sort((a, b) => a.order - b.order);
     if (this.levels.length === 0) throw new Error('LevelManager needs at least one level.');
+    this.endless = endless;
   }
 
+  // Number of distinct layouts, or Infinity in endless mode.
   get count() {
+    return this.endless ? Infinity : this.levels.length;
+  }
+
+  get layoutCount() {
     return this.levels.length;
   }
 
   getLevel(index) {
+    if (!Number.isInteger(index) || index < 0) throw new Error(`Level ${index + 1} does not exist.`);
+    if (this.endless) return deepFreeze(createEndlessLevel(this.levels, index));
     const level = this.levels[index];
     if (!level) throw new Error(`Level ${index + 1} does not exist.`);
     return level;
   }
 
   isFinalLevel(index) {
-    return index === this.levels.length - 1;
+    return !this.endless && index === this.levels.length - 1;
   }
 }

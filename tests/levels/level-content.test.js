@@ -11,7 +11,7 @@ const levels = [level1, level2, level3];
 
 describe('production levels', () => {
   it('load through LevelManager', () => {
-    const manager = new LevelManager(levels);
+    const manager = new LevelManager(levels, { endless: false });
     expect(manager.count).toBe(3);
     expect(manager.getLevel(2).rescue.isFinalLevel).toBe(true);
     expect(manager.getLevel(0).rescue.isFinalLevel).toBe(false);

@@ -293,6 +293,7 @@ export class PlayScene extends Phaser.Scene {
       this.sounds?.play('gameOver');
       this.overlay.show(uiText.gameOver.heading, [
         `${uiText.gameOver.finalScore}: ${snapshot.score}`,
+        `${uiText.gameOver.levelReached}: ${snapshot.levelIndex + 1}`,
         getControlCopy().gameOverRetry,
         getControlCopy().gameOverTitle,
       ]);
