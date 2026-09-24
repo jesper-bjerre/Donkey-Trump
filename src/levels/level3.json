@@ -141,7 +141,8 @@
     "platformFollowMode": "slope",
     "maxActive": 8,
     "route": {
-      "ladderDropChance": 0.3
+      "ladderDropChance": 0.3,
+      "directThrowChance": 0.4
     }
   },
   "rescue": {

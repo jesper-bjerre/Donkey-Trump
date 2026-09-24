@@ -136,7 +136,8 @@
         "platformFollowMode": "slope",
         "maxActive": 5,
         "route": {
-          "ladderDropChance": 0
+          "ladderDropChance": 0,
+          "directThrowChance": 0.2
         }
       },
       "rescue": {
@@ -319,7 +320,8 @@
         "platformFollowMode": "slope",
         "maxActive": 6,
         "route": {
-          "ladderDropChance": 0.15
+          "ladderDropChance": 0.15,
+          "directThrowChance": 0.3
         }
       },
       "rescue": {
@@ -484,7 +486,8 @@
         "platformFollowMode": "slope",
         "maxActive": 8,
         "route": {
-          "ladderDropChance": 0.3
+          "ladderDropChance": 0.3,
+          "directThrowChance": 0.4
         }
       },
       "rescue": {

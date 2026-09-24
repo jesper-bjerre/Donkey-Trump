@@ -113,8 +113,8 @@
       "key": "player.jumpman.sheet",
       "type": "spritesheet",
       "path": "src/assets/sprites/player-jumpman-lokke-sheet.svg",
-      "frameWidth": 24,
-      "frameHeight": 32,
+      "frameWidth": 36,
+      "frameHeight": 48,
       "frameCount": 7,
       "preload": true,
       "registerId": "player"

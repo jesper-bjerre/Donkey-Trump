@@ -5,8 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const OUT = path.resolve(import.meta.dirname, '../src/assets/sprites');
-const sheet = (frameWidth, frameHeight, frames, note) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="${frameWidth * frames.length}" height="${frameHeight}" viewBox="0 0 ${frameWidth * frames.length} ${frameHeight}">\n` +
+// Frames are drawn in design units (frameWidth x frameHeight) and rasterized at
+// `scale`, so a bigger on-screen sprite stays crisp instead of being upscaled.
+const sheet = (frameWidth, frameHeight, frames, note, scale = 1) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${frameWidth * frames.length * scale}" height="${frameHeight * scale}" viewBox="0 0 ${frameWidth * frames.length} ${frameHeight}">\n` +
   `  <!-- ${note} -->\n` +
   frames.map((frame, i) => `  <g transform="translate(${i * frameWidth} 0)">${frame}</g>`).join('\n') +
   '\n</svg>\n';
@@ -105,7 +107,8 @@ const rescueFrames = [
 ];
 
 const files = {
-  'player-jumpman-lokke-sheet.svg': sheet(24, 32, playerFrames, 'Original Jumpman Løkke sheet: idle, walk A, walk B, jump, climb A, climb B, hit.'),
+  // Jumpman is drawn at 1.5x (36x48 frames) so he reads clearly next to the girders.
+  'player-jumpman-lokke-sheet.svg': sheet(24, 32, playerFrames, 'Original Jumpman Løkke sheet: idle, walk A, walk B, jump, climb A, climb B, hit.', 1.5),
   'boss-trump-inspired-sheet.svg': sheet(72, 72, bossFrames, 'Original Trump-inspired boss sheet: idle, angry, throw.'),
   'barrel-original-sheet.svg': sheet(18, 18, barrelFrames, 'Original barrel roll sheet: four rotation frames.'),
   'rescue-motzfeldt-sheet.svg': sheet(28, 44, rescueFrames, 'Original Motzfeldt sheet: wave A, wave B, rescued.'),

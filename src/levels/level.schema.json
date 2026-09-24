@@ -122,7 +122,13 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "ladderDropChance": { "type": "number", "minimum": 0, "maximum": 1 }
+            "ladderDropChance": { "type": "number", "minimum": 0, "maximum": 1 },
+            "directThrowChance": {
+              "description": "Chance that a barrel is hurled straight at the player instead of rolling.",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
           }
         }
       }

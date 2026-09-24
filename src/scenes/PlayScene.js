@@ -75,7 +75,8 @@ export class PlayScene extends Phaser.Scene {
     this.stateMachine.subscribe((snapshot) => this.hud.updateFromState(snapshot));
 
     this.player = this.physics.add.sprite(0, 0, this.animated ? ANIMATION_SHEETS.player : 'player.jumpman').setDepth(10);
-    this.player.body.setSize(16, 30).setOffset(4, 2);
+    // 36x48 frames: a slimmer 22x45 body keeps hits fair, with the feet on the frame bottom.
+    this.player.body.setSize(22, 45).setOffset(7, 3);
     this.player.body.setMaxVelocity(400, MAX_FALL_SPEED);
     this.player.setCollideWorldBounds(true);
     this.playerController = new PlayerController(this.player);
@@ -163,6 +164,7 @@ export class PlayScene extends Phaser.Scene {
       level,
       getSpawnPoint: () => this.boss.getBarrelSpawnPoint(),
       createBarrelSprite: () => this.createBarrelSprite(level.barrels.spriteKey),
+      getTarget: () => ({ x: getBodyCenterX(this.player.body), feet: this.player.body.y + this.player.body.height }),
       onSpawn: () => {
         this.boss.playThrow();
         this.sounds?.play('throw');

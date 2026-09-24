@@ -55,6 +55,15 @@ describe('difficulty progression', () => {
     });
   });
 
+  it('direct throws become more frequent, never more than half of all barrels', () => {
+    const chances = LEVELS.map((level) => level.barrels.route.directThrowChance);
+    chances.forEach((value, i) => {
+      expect(value).toBeGreaterThan(0);
+      expect(value).toBeLessThanOrEqual(0.5);
+      if (i > 0) expect(value).toBeGreaterThanOrEqual(chances[i - 1]);
+    });
+  });
+
   it('difficulty tiers increase with level order', () => {
     LEVELS.forEach((level, i) => expect(level.difficulty.tier).toBe(i + 1));
   });

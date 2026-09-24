@@ -1,6 +1,9 @@
 // Barrels spawn at the boss anchor moving right-to-left, roll downhill along the
 // girders via SlopeResolver, drop to the girder below at each end, and may take a
-// ladder down when the level enables it. Sprites are pooled.
+// ladder down when the level enables it. Some barrels are instead hurled directly
+// at the player: they fly through the girders in an arc aimed at the player's x
+// and land on the player's floor, then roll on like any other barrel. Sprites are pooled.
+import { WORLD_GRAVITY_Y } from '../config/physics.js';
 import { getDownhillDirection, resolveBodyToSlope } from './SlopeResolver.js';
 import { getBodyBounds, getBodyCenterX, placeBodyBottom, placeBodyCenterX } from './bodyPlacement.js';
 
@@ -11,13 +14,27 @@ export const BARREL_DEFAULTS = {
   fallSpeedFactor: 0.25,
   ladderDropSpeed: 70,
   radiusPx: 9,
+  // Direct throws only target a player at least this far below the throw point.
+  directThrowMinDropPx: 60,
+  directThrowMaxSpeedX: 320,
 };
+
+// Horizontal speed that makes a barrel released at rest reach `target` when it has
+// fallen to the target's feet: t = sqrt(2 * drop / g), vx = dx / t.
+export function computeDirectThrowVelocity(from, target, { gravityY = WORLD_GRAVITY_Y, maxSpeedX = BARREL_DEFAULTS.directThrowMaxSpeedX } = {}) {
+  const drop = target.feet - from.y;
+  if (drop <= 0) return null;
+  const seconds = Math.sqrt((2 * drop) / gravityY);
+  const vx = (target.x - from.x) / seconds;
+  return Math.max(-maxSpeedX, Math.min(maxSpeedX, vx));
+}
 
 const LADDER_ALIGN_PX = 4;
 
 export class BarrelSystem {
-  constructor({ level, getSpawnPoint, createBarrelSprite, onSpawn = () => {}, random = Math.random, settings = {} }) {
+  constructor({ level, getSpawnPoint, createBarrelSprite, getTarget = () => null, onSpawn = () => {}, random = Math.random, settings = {} }) {
     this.level = level;
+    this.getTarget = getTarget;
     this.config = { ...BARREL_DEFAULTS, ...level.barrels, ...settings };
     this.getSpawnPoint = getSpawnPoint;
     this.createBarrelSprite = createBarrelSprite;
@@ -27,6 +44,20 @@ export class BarrelSystem {
     this.pool = [];
     this.elapsedMs = 0;
     this.nextSpawnAt = this.config.firstSpawnDelayMs;
+  }
+
+  get directThrowChance() {
+    return this.config.route?.directThrowChance ?? 0;
+  }
+
+  // Decides whether this spawn is hurled at the player, returning the aim or null.
+  planDirectThrow(point) {
+    if (this.directThrowChance <= 0) return null;
+    const target = this.getTarget();
+    if (!target || target.feet - point.y < this.config.directThrowMinDropPx) return null;
+    if (this.random() >= this.directThrowChance) return null;
+    const vx = computeDirectThrowVelocity(point, target, { maxSpeedX: this.config.directThrowMaxSpeedX });
+    return vx === null ? null : { vx, targetFeet: target.feet };
   }
 
   get ladderDropChance() {
@@ -47,7 +78,7 @@ export class BarrelSystem {
     for (const barrel of [...this.active]) this.stepBarrel(barrel, deltaMs);
   }
 
-  spawnBarrel(point = this.getSpawnPoint()) {
+  spawnBarrel(point = this.getSpawnPoint(), { throwPlan = this.planDirectThrow(point) } = {}) {
     const record = this.pool.pop() ?? this.createRecord();
     const sprite = record.sprite;
     if (sprite.body.reset) sprite.body.reset(point.x, point.y);
@@ -66,11 +97,14 @@ export class BarrelSystem {
       jumpAwarded: false,
       speed: this.randomSpeed(),
       direction: -1,
-      mode: 'falling',
+      mode: throwPlan ? 'thrown' : 'falling',
+      thrown: Boolean(throwPlan),
+      targetFeet: throwPlan?.targetFeet ?? null,
       dropLadder: null,
       decidedLadders: new Set(),
     });
-    sprite.body.setVelocityX(-record.speed);
+    sprite.body.setVelocityX(throwPlan ? throwPlan.vx : -record.speed);
+    if (throwPlan) sprite.body.setVelocityY(0);
     this.active.push(record);
     this.onSpawn(record);
     return record;
@@ -90,7 +124,13 @@ export class BarrelSystem {
     const { sprite } = barrel;
     const body = sprite.body;
 
-    if (barrel.mode === 'dropping') {
+    if (barrel.mode === 'thrown') {
+      // Flies through girders until it reaches the player's floor, then lands normally.
+      if (body.y + body.height >= barrel.targetFeet - 4) {
+        barrel.mode = 'falling';
+        barrel.direction = Math.sign(body.velocity.x) || barrel.direction;
+      }
+    } else if (barrel.mode === 'dropping') {
       body.setVelocityX(0);
       body.setVelocityY(this.config.ladderDropSpeed);
       const ladder = barrel.dropLadder;
@@ -117,7 +157,9 @@ export class BarrelSystem {
       }
     }
 
-    sprite.rotation += (body.velocity.x * (deltaMs / 1000)) / this.config.radiusPx;
+    // Thrown barrels tumble fast in the air; rolling ones turn with their speed.
+    const spin = barrel.mode === 'thrown' ? Math.sign(body.velocity.x || -1) * 12 : body.velocity.x / this.config.radiusPx;
+    sprite.rotation += spin * (deltaMs / 1000);
 
     const { width, height } = this.level.dimensions;
     const bounds = getBodyBounds(body);
