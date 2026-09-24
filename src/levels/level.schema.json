@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://donkey-trump.local/level.schema.json",
+  "title": "Donkey Trump level definition",
+  "description": "Declarative level layout. Girders are line segments resolved by SlopeResolver (Arcade Physics has no native slopes); ladders are overlap zones, not platforms.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "order",
+    "dimensions",
+    "playerSpawn",
+    "girders",
+    "ladders",
+    "boss",
+    "barrels",
+    "rescue",
+    "difficulty",
+    "tuning"
+  ],
+  "definitions": {
+    "coordX": { "type": "number", "minimum": -200, "maximum": 4000 },
+    "coordY": { "type": "number", "minimum": -200, "maximum": 4000 },
+    "size": { "type": "number", "exclusiveMinimum": 0, "maximum": 4000 },
+    "assetKey": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9.]{0,63}$" },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "$ref": "#/definitions/coordX" },
+        "y": { "$ref": "#/definitions/coordY" }
+      }
+    },
+    "girder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x1", "y1", "x2", "y2", "visualKey", "collisionMode"],
+      "properties": {
+        "id": { "type": "string", "maxLength": 32 },
+        "x1": { "$ref": "#/definitions/coordX" },
+        "y1": { "$ref": "#/definitions/coordY" },
+        "x2": { "$ref": "#/definitions/coordX" },
+        "y2": { "$ref": "#/definitions/coordY" },
+        "visualKey": { "$ref": "#/definitions/assetKey" },
+        "collisionMode": {
+          "description": "slope-line: y resolved along the segment each frame. flat-body: treated as a horizontal surface at min(y1, y2).",
+          "enum": ["slope-line", "flat-body"]
+        }
+      }
+    },
+    "ladder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height", "snapX", "climbSpeedOverride"],
+      "properties": {
+        "id": { "type": "string", "maxLength": 32 },
+        "x": { "$ref": "#/definitions/coordX" },
+        "y": { "$ref": "#/definitions/coordY" },
+        "width": { "$ref": "#/definitions/size" },
+        "height": { "$ref": "#/definitions/size" },
+        "snapX": { "$ref": "#/definitions/coordX" },
+        "climbSpeedOverride": {
+          "description": "Pixels per second, or null to use the LadderSystem default.",
+          "type": ["number", "null"],
+          "minimum": 10,
+          "maximum": 400
+        }
+      }
+    }
+  },
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]{1,32}$" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "order": { "type": "integer", "minimum": 1, "maximum": 99 },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "minimum": 320, "maximum": 4000 },
+        "height": { "type": "number", "minimum": 240, "maximum": 4000 }
+      }
+    },
+    "playerSpawn": { "$ref": "#/definitions/point" },
+    "girders": { "type": "array", "minItems": 1, "maxItems": 64, "items": { "$ref": "#/definitions/girder" } },
+    "ladders": { "type": "array", "minItems": 1, "maxItems": 64, "items": { "$ref": "#/definitions/ladder" } },
+    "boss": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "spriteKey", "spawnAnchorOffset"],
+      "properties": {
+        "x": { "$ref": "#/definitions/coordX" },
+        "y": { "$ref": "#/definitions/coordY" },
+        "spriteKey": { "$ref": "#/definitions/assetKey" },
+        "spawnAnchorOffset": { "$ref": "#/definitions/point" },
+        "animation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "throwKey": { "$ref": "#/definitions/assetKey" },
+            "idleKey": { "$ref": "#/definitions/assetKey" }
+          }
+        }
+      }
+    },
+    "barrels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spriteKey", "spawnIntervalMs", "speedMin", "speedMax", "platformFollowMode"],
+      "properties": {
+        "spriteKey": { "$ref": "#/definitions/assetKey" },
+        "spawnIntervalMs": { "type": "number", "minimum": 500, "maximum": 20000 },
+        "firstSpawnDelayMs": { "type": "number", "minimum": 0, "maximum": 20000 },
+        "speedMin": { "type": "number", "minimum": 20, "maximum": 400 },
+        "speedMax": { "type": "number", "minimum": 20, "maximum": 400 },
+        "gravityY": { "type": "number", "minimum": 0, "maximum": 3000 },
+        "platformFollowMode": { "enum": ["slope"] },
+        "maxActive": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "route": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ladderDropChance": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "rescue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height", "spriteKey", "isFinalLevel"],
+      "properties": {
+        "x": { "$ref": "#/definitions/coordX" },
+        "y": { "$ref": "#/definitions/coordY" },
+        "width": { "$ref": "#/definitions/size" },
+        "height": { "$ref": "#/definitions/size" },
+        "spriteKey": { "$ref": "#/definitions/assetKey" },
+        "objectiveKey": { "type": "string", "maxLength": 32 },
+        "isFinalLevel": { "type": "boolean" }
+      }
+    },
+    "difficulty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "label"],
+      "properties": {
+        "tier": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "label": { "type": "string", "maxLength": 32 }
+      }
+    },
+    "tuning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["jumpClearanceRequired", "maxDirectJumpPx", "minFloorGapPx"],
+      "properties": {
+        "jumpClearanceRequired": { "type": "boolean" },
+        "maxDirectJumpPx": { "type": "number", "minimum": 1, "maximum": 1000 },
+        "minFloorGapPx": { "type": "number", "minimum": 1, "maximum": 1000 }
+      }
+    }
+  }
+}

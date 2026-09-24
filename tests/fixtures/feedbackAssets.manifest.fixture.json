@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "criticalStartupKeys": [],
+  "sprites": [],
+  "manifestNotes": "fixture",
+  "audio": [
+    { "key": "feedback.hit.audio", "type": "audio", "path": "src/assets/audio/hit.wav", "preload": true, "registerId": "hitAudio" },
+    { "key": "feedback.retry.audio", "type": "audio", "path": "src/assets/audio/retry-missing.wav", "preload": true, "registerId": "retryAudio" },
+    { "key": "feedback.rescue.audio", "type": "audio", "path": "src/assets/audio/rescue-sample-pack.mp3", "preload": true, "registerId": "rescueAudio" }
+  ],
+  "effects": [
+    { "key": "feedback.hit.effect", "type": "json", "path": "src/assets/effects/hit.json", "preload": true, "registerId": "hitEffect" }
+  ]
+}

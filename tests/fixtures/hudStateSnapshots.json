@@ -1,0 +1,9 @@
+{
+  "start": { "currentState": "start", "score": 0, "lives": 3, "levelIndex": 0, "totalLevels": 3 },
+  "play": { "currentState": "play", "score": 1200, "lives": 3, "levelIndex": 1, "totalLevels": 3 },
+  "lifeLoss": { "currentState": "life-loss", "score": 1200, "lives": 2, "levelIndex": 1, "totalLevels": 3 },
+  "gameOver": { "currentState": "game-over", "score": 1300, "lives": 0, "levelIndex": 1, "totalLevels": 3 },
+  "levelComplete": { "currentState": "level-complete", "score": 2200, "lives": 2, "levelIndex": 1, "totalLevels": 3 },
+  "victory": { "currentState": "victory", "score": 5000, "lives": 2, "levelIndex": 2, "totalLevels": 3 },
+  "corrupt": { "currentState": "play", "score": null, "lives": -2, "levelIndex": 0, "totalLevels": 3 }
+}

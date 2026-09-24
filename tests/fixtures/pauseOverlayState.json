@@ -1,0 +1,6 @@
+{
+  "play": { "currentState": "play", "score": 1300, "lives": 2, "levelIndex": 1, "totalLevels": 3 },
+  "pause": { "currentState": "pause", "score": 1300, "lives": 2, "levelIndex": 1, "totalLevels": 3 },
+  "setupActions": ["startGame", "completeLevel", "startNextLevel", "loseLife", "retryLevel", "startLevel"],
+  "setupScore": 300
+}

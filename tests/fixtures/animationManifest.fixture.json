@@ -1,0 +1,17 @@
+{
+  "complete": {
+    "sprites": [
+      { "key": "player.jumpman.sheet", "type": "spritesheet", "path": "src/assets/sprites/player-jumpman-lokke-sheet.svg", "frameWidth": 24, "frameHeight": 32 },
+      { "key": "boss.trumpInspired.sheet", "type": "spritesheet", "path": "src/assets/sprites/boss-trump-inspired-sheet.svg", "frameWidth": 72, "frameHeight": 72 },
+      { "key": "barrel.original.sheet", "type": "spritesheet", "path": "src/assets/sprites/barrel-original-sheet.svg", "frameWidth": 18, "frameHeight": 18 },
+      { "key": "rescue.motzfeldt.sheet", "type": "spritesheet", "path": "src/assets/sprites/rescue-motzfeldt-sheet.svg", "frameWidth": 28, "frameHeight": 44 }
+    ]
+  },
+  "missingBoss": {
+    "sprites": [
+      { "key": "player.jumpman.sheet", "type": "spritesheet", "path": "src/assets/sprites/player-jumpman-lokke-sheet.svg", "frameWidth": 24, "frameHeight": 32 },
+      { "key": "barrel.original.sheet", "type": "spritesheet", "path": "src/assets/sprites/barrel-original-sheet.svg", "frameWidth": 18, "frameHeight": 18 },
+      { "key": "rescue.motzfeldt.sheet", "type": "spritesheet", "path": "src/assets/sprites/rescue-motzfeldt-sheet.svg", "frameWidth": 28, "frameHeight": 44 }
+    ]
+  }
+}

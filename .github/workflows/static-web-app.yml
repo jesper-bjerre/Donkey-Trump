@@ -1,0 +1,293 @@
+# Validate, scan, build and deploy the static Phaser game to Azure Static Web Apps.
+#
+#   pull_request      -> validate + scan + build, deploy a PR preview environment
+#   push to main      -> validate + scan + build, deploy the "staging" environment
+#   tag v*            -> validate + scan + build, deploy production (approval-gated)
+#   workflow_dispatch -> deploy staging or production from the selected ref, or
+#                        roll back by redeploying the artifact of an earlier run
+#
+# Required repository configuration (never commit real values):
+#   secrets.AZURE_STATIC_WEB_APPS_API_TOKEN  deployment token, scoped to this app, rotated every 90 days
+#   vars.PRODUCTION_URL / vars.STAGING_URL   base URLs used by smoke tests
+#   Environment "production" with required reviewers (the manual approval gate)
+# Rollback procedure: docs/production-smoke-and-rollback.md
+#
+# Supply chain: every action is pinned to a full commit SHA (tag in the trailing
+# comment) and the gitleaks image to a digest. Dependabot proposes updates weekly.
+
+name: Static Web App
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Environment to deploy
+        type: choice
+        options: [staging, production]
+        default: staging
+      artifact_run_id:
+        description: Rollback only - ID of an earlier successful run whose static-site artifact should be redeployed. Leave empty to deploy this ref.
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-web-app-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: '22'
+  # One artifact per commit; its name is recorded in each deployment summary for rollback.
+  ARTIFACT_NAME: static-site-${{ github.sha }}
+
+jobs:
+  validate:
+    name: Validate
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm run test:run
+      - name: Integration tests
+        run: npm run test:integration
+
+  scan:
+    name: Security scan
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: high
+      - name: Vulnerability audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Secret scan
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            detect --source /repo --redact --no-banner --exit-code 1
+      - name: License check
+        run: npm run licenses
+
+  build:
+    name: Build
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build static artifact
+        run: npm run build
+      - name: Bundle size report (fails over the 5 MB startup budget)
+        run: |
+          npm run bundle:report | tee bundle-report.txt
+          { echo '### Bundle report'; echo '```'; cat bundle-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Performance budget test
+        run: npx vitest run tests/performance
+      - name: Upload static artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 90
+
+  deploy-preview:
+    name: Deploy PR preview
+    # Fork PRs get no secrets, so they are validated but not deployed.
+    if: >-
+      github.event_name == 'pull_request' && github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    needs: [build, scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download static artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: .
+      - name: Deploy preview
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ github.token }}
+          action: upload
+          # The prebuilt artifact is downloaded into the workspace root, so app_location "/"
+          # is the built site; skip_app_build means Azure deploys it as-is (output_location
+          # documents the build folder the artifact came from).
+          app_location: /
+          output_location: dist
+          skip_app_build: true
+          skip_api_build: true
+
+  close-preview:
+    name: Close PR preview
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: preview
+    steps:
+      - uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: close
+          app_location: /
+
+  deploy-staging:
+    name: Deploy staging
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.target == 'staging')
+    needs: [build, scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    steps:
+      # The workspace holds only the artifact: everything here is published.
+      - name: Download static artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: .
+      - name: Deploy staging
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          deployment_environment: staging
+          app_location: /
+          output_location: dist
+          skip_app_build: true
+          skip_api_build: true
+
+  smoke-staging:
+    name: Smoke test staging
+    needs: deploy-staging
+    if: vars.STAGING_URL != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: scripts
+      - name: Smoke test
+        env:
+          STAGING_URL: ${{ vars.STAGING_URL }}
+        run: |
+          curl --fail --silent --show-error --location "$STAGING_URL/" --output /dev/null
+          bash scripts/smoke-test.sh "$STAGING_URL"
+
+  deploy-production:
+    name: Deploy production
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && inputs.target == 'production')
+    needs: [build, scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: static-web-app-production
+      cancel-in-progress: false
+    # Required reviewers on this environment are the manual production approval gate.
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      # The workspace holds only the artifact: everything here is published.
+      - name: Download artifact from this run
+        if: inputs.artifact_run_id == ''
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: .
+      - name: Download rollback artifact from an earlier run
+        if: inputs.artifact_run_id != ''
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          run-id: ${{ inputs.artifact_run_id }}
+          github-token: ${{ github.token }}
+          pattern: static-site-*
+          merge-multiple: true
+          path: .
+      - name: Record deployed artifact
+        run: |
+          if [ -n "${{ inputs.artifact_run_id }}" ]; then
+            source="rollback artifact static-site-* from run ${{ inputs.artifact_run_id }}"
+          else
+            source="${{ env.ARTIFACT_NAME }} from run ${{ github.run_id }}"
+          fi
+          test -f index.html || { echo "::error::Artifact has no index.html"; exit 1; }
+          echo "### Production deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: $source" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Ref: ${{ github.ref_name }} (${{ github.sha }})" >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy production
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: /
+          output_location: dist
+          skip_app_build: true
+          skip_api_build: true
+
+  smoke-production:
+    name: Smoke test production
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          sparse-checkout: scripts
+      # Fails closed: a missing URL, non-200 shell, missing #game marker, missing
+      # asset or missing security header fails the workflow. Roll back per the runbook.
+      - name: Smoke test
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          test -n "$PRODUCTION_URL" || { echo "::error::vars.PRODUCTION_URL is not set"; exit 1; }
+          curl --fail --silent --show-error --location "$PRODUCTION_URL/" --output /dev/null
+          bash scripts/smoke-test.sh "$PRODUCTION_URL"

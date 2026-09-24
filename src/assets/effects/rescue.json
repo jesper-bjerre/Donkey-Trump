@@ -1,0 +1,11 @@
+{
+  "key": "feedback.rescue.effect",
+  "kind": "float-text",
+  "target": "rescue",
+  "text": "Thank you!",
+  "color": "#ffd23f",
+  "offsetY": -56,
+  "riseBy": 28,
+  "durationMs": 1200,
+  "reducedMotion": { "riseBy": 0 }
+}

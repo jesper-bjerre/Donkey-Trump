@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "criticalStartupKeys": [
+    "player.placeholder",
+    "boss.placeholder",
+    "rescue.placeholder",
+    "barrel.placeholder",
+    "platform.placeholder",
+    "ladder.placeholder",
+    "hud.lifeIcon.placeholder"
+  ],
+  "sprites": [
+    {
+      "key": "player.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/player-placeholder.svg",
+      "width": 24,
+      "height": 32,
+      "preload": true,
+      "registerId": "player"
+    },
+    {
+      "key": "boss.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/boss-placeholder.svg",
+      "width": 72,
+      "height": 72,
+      "preload": true,
+      "registerId": "boss"
+    },
+    {
+      "key": "rescue.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/rescue-placeholder.svg",
+      "width": 28,
+      "height": 44,
+      "preload": true,
+      "registerId": "rescue"
+    },
+    {
+      "key": "barrel.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/barrel-not-committed.svg",
+      "width": 18,
+      "height": 18,
+      "preload": true,
+      "registerId": "barrel"
+    },
+    {
+      "key": "platform.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/platform-placeholder.svg",
+      "width": 32,
+      "height": 12,
+      "preload": true,
+      "registerId": "platform"
+    },
+    {
+      "key": "ladder.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/ladder-placeholder.svg",
+      "width": 20,
+      "height": 16,
+      "preload": true,
+      "registerId": "ladder"
+    },
+    {
+      "key": "hud.lifeIcon.placeholder",
+      "type": "svg",
+      "path": "src/assets/sprites/hud-life-placeholder.svg",
+      "width": 16,
+      "height": 16,
+      "preload": true,
+      "registerId": "hud"
+    },
+    {
+      "key": "player.jumpman",
+      "type": "svg",
+      "path": "src/assets/sprites/player-jumpman-lokke.svg",
+      "width": 24,
+      "height": 32,
+      "preload": true,
+      "registerId": "player"
+    },
+    {
+      "key": "rescue.motzfeldt",
+      "type": "svg",
+      "path": "src/assets/sprites/rescue-motzfeldt.svg",
+      "width": 28,
+      "height": 44,
+      "preload": true,
+      "registerId": "rescue"
+    },
+    {
+      "key": "boss.trumpInspired",
+      "type": "svg",
+      "path": "src/assets/sprites/boss-trump-inspired.svg",
+      "width": 72,
+      "height": 72,
+      "preload": true,
+      "registerId": "boss"
+    },
+    {
+      "key": "barrel.original",
+      "type": "svg",
+      "path": "src/assets/sprites/barrel-original.svg",
+      "width": 18,
+      "height": 18,
+      "preload": true,
+      "registerId": "barrel"
+    },
+    {
+      "key": "player.jumpman.sheet",
+      "type": "spritesheet",
+      "path": "src/assets/sprites/player-jumpman-lokke-sheet.svg",
+      "frameWidth": 24,
+      "frameHeight": 32,
+      "frameCount": 7,
+      "preload": true,
+      "registerId": "player"
+    },
+    {
+      "key": "boss.trumpInspired.sheet",
+      "type": "spritesheet",
+      "path": "src/assets/sprites/boss-trump-inspired-sheet.svg",
+      "frameWidth": 72,
+      "frameHeight": 72,
+      "frameCount": 3,
+      "preload": true,
+      "registerId": "boss"
+    },
+    {
+      "key": "barrel.original.sheet",
+      "type": "spritesheet",
+      "path": "src/assets/sprites/barrel-original-sheet.svg",
+      "frameWidth": 18,
+      "frameHeight": 18,
+      "frameCount": 4,
+      "preload": true,
+      "registerId": "barrel"
+    },
+    {
+      "key": "rescue.motzfeldt.sheet",
+      "type": "spritesheet",
+      "path": "src/assets/sprites/rescue-motzfeldt-sheet.svg",
+      "frameWidth": 28,
+      "frameHeight": 44,
+      "frameCount": 3,
+      "preload": true,
+      "registerId": "rescue"
+    }
+  ],
+  "audio": [
+    {
+      "key": "feedback.hit.audio",
+      "type": "audio",
+      "path": "src/assets/audio/hit.wav",
+      "preload": true,
+      "optional": true,
+      "registerId": "hitAudio"
+    },
+    {
+      "key": "feedback.retry.audio",
+      "type": "audio",
+      "path": "src/assets/audio/retry.wav",
+      "preload": true,
+      "optional": true,
+      "registerId": "retryAudio"
+    },
+    {
+      "key": "feedback.rescue.audio",
+      "type": "audio",
+      "path": "src/assets/audio/rescue.wav",
+      "preload": true,
+      "optional": true,
+      "registerId": "rescueAudio"
+    }
+  ],
+  "effects": [
+    {
+      "key": "effect.hit.placeholder",
+      "type": "svg",
+      "path": "src/assets/effects/hit-flash-placeholder.svg",
+      "width": 32,
+      "height": 32,
+      "preload": true,
+      "registerId": "hitEffect"
+    },
+    {
+      "key": "feedback.hit.effect",
+      "type": "json",
+      "path": "src/assets/effects/hit.json",
+      "preload": true,
+      "registerId": "hitEffect"
+    },
+    {
+      "key": "feedback.retry.effect",
+      "type": "json",
+      "path": "src/assets/effects/retry.json",
+      "preload": true,
+      "registerId": "retryEffect"
+    },
+    {
+      "key": "feedback.rescue.effect",
+      "type": "json",
+      "path": "src/assets/effects/rescue.json",
+      "preload": true,
+      "registerId": "rescueEffect"
+    }
+  ],
+  "manifestNotes": "All files are small, local and original. Placeholder keys keep the shell bootable; character keys and *.sheet animation sheets are launch-candidate caricatures pending originality review. Audio entries are optional: a failed or blocked sound never blocks boot."
+}

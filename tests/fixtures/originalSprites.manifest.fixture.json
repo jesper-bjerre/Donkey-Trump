@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "criticalStartupKeys": [],
+  "audio": [],
+  "effects": [],
+  "manifestNotes": "fixture",
+  "sprites": [
+    {
+      "key": "player.jumpman",
+      "type": "svg",
+      "path": "src/assets/sprites/player-jumpman-lokke.svg",
+      "width": 24,
+      "height": 32,
+      "preload": true,
+      "registerId": "player"
+    },
+    {
+      "key": "barrel.copied",
+      "type": "svg",
+      "path": "src/assets/sprites/barrel-copied.svg",
+      "width": 18,
+      "height": 18,
+      "preload": true,
+      "registerId": "barrel"
+    },
+    {
+      "key": "boss.gif",
+      "type": "image",
+      "path": "src/assets/sprites/boss.gif",
+      "width": 72,
+      "height": 72,
+      "preload": true,
+      "registerId": "boss"
+    }
+  ]
+}

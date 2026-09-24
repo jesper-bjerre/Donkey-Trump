@@ -1,0 +1,8 @@
+{
+  "key": "feedback.retry.effect",
+  "kind": "blink",
+  "target": "player",
+  "durationMs": 900,
+  "blinkIntervalMs": 120,
+  "reducedMotion": { "blinkIntervalMs": 0, "durationMs": 600 }
+}

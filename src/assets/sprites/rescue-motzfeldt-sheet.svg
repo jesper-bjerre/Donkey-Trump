@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="84" height="44" viewBox="0 0 84 44">
+  <!-- Original Motzfeldt sheet: wave A, wave B, rescued. -->
+  <g transform="translate(0 0)">
+    <path d="M6.5 9 C6 2.5 10 0.5 14 0.5 C18 0.5 22 2.5 21.5 9 L22.5 17 H5.5 Z" fill="#23201f"/>
+    <ellipse cx="14" cy="8.6" rx="5.4" ry="6" fill="#dcb08c"/>
+    <path d="M8.6 5.6 C10.5 3 17.5 3 19.4 5.6 C17 4.6 11 4.6 8.6 5.6 Z" fill="#23201f"/>
+    <circle cx="11.9" cy="8.4" r="0.8" fill="#222"/><circle cx="16.1" cy="8.4" r="0.8" fill="#222"/>
+    <ellipse cx="14" cy="12" rx="1.6" ry="1.1" fill="#9c2d3a"/>
+    <path d="M6 17 Q14 14.5 22 17 L24.5 36 H3.5 Z" fill="#ffffff"/>
+    <path d="M5 26 H23 L24.5 36 H3.5 Z" fill="#c8102e"/>
+    <circle cx="14" cy="26" r="4.2" fill="#c8102e"/>
+    <path d="M9.8 26 A4.2 4.2 0 0 0 18.2 26 Z" fill="#ffffff"/>
+    <path d="M22 18 L26.5 9" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M6 18 L3.5 27" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="8.5" y="36" width="3.5" height="7" fill="#3a2a22"/><rect x="16" y="36" width="3.5" height="7" fill="#3a2a22"/>
+    </g>
+  <g transform="translate(28 0)">
+    <path d="M6.5 9 C6 2.5 10 0.5 14 0.5 C18 0.5 22 2.5 21.5 9 L22.5 17 H5.5 Z" fill="#23201f"/>
+    <ellipse cx="14" cy="8.6" rx="5.4" ry="6" fill="#dcb08c"/>
+    <path d="M8.6 5.6 C10.5 3 17.5 3 19.4 5.6 C17 4.6 11 4.6 8.6 5.6 Z" fill="#23201f"/>
+    <circle cx="11.9" cy="8.4" r="0.8" fill="#222"/><circle cx="16.1" cy="8.4" r="0.8" fill="#222"/>
+    <ellipse cx="14" cy="12" rx="1.6" ry="1.1" fill="#9c2d3a"/>
+    <path d="M6 17 Q14 14.5 22 17 L24.5 36 H3.5 Z" fill="#ffffff"/>
+    <path d="M5 26 H23 L24.5 36 H3.5 Z" fill="#c8102e"/>
+    <circle cx="14" cy="26" r="4.2" fill="#c8102e"/>
+    <path d="M9.8 26 A4.2 4.2 0 0 0 18.2 26 Z" fill="#ffffff"/>
+    <path d="M22 18 L25 5" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M6 18 L3.5 27" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="8.5" y="36" width="3.5" height="7" fill="#3a2a22"/><rect x="16" y="36" width="3.5" height="7" fill="#3a2a22"/>
+    </g>
+  <g transform="translate(56 0)">
+    <path d="M6.5 9 C6 2.5 10 0.5 14 0.5 C18 0.5 22 2.5 21.5 9 L22.5 17 H5.5 Z" fill="#23201f"/>
+    <ellipse cx="14" cy="8.6" rx="5.4" ry="6" fill="#dcb08c"/>
+    <path d="M8.6 5.6 C10.5 3 17.5 3 19.4 5.6 C17 4.6 11 4.6 8.6 5.6 Z" fill="#23201f"/>
+    <circle cx="11.9" cy="8.4" r="0.8" fill="#222"/><circle cx="16.1" cy="8.4" r="0.8" fill="#222"/>
+    <path d="M11.6 11.4 Q14 13.6 16.4 11.4" stroke="#9c2d3a" stroke-width="1" fill="none"/>
+    <path d="M6 17 Q14 14.5 22 17 L24.5 36 H3.5 Z" fill="#ffffff"/>
+    <path d="M5 26 H23 L24.5 36 H3.5 Z" fill="#c8102e"/>
+    <circle cx="14" cy="26" r="4.2" fill="#c8102e"/>
+    <path d="M9.8 26 A4.2 4.2 0 0 0 18.2 26 Z" fill="#ffffff"/>
+    <path d="M22 18 L25.5 9" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M6 18 L2.5 9" stroke="#dcb08c" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="8.5" y="36" width="3.5" height="7" fill="#3a2a22"/><rect x="16" y="36" width="3.5" height="7" fill="#3a2a22"/>
+    <path d="M3 3.5 A1.6 1.6 0 0 1 6 3.5 A1.6 1.6 0 0 1 9 3.5 Q9 5.6 6 7.6 Q3 5.6 3 3.5 Z" fill="#ff5a7a"/></g>
+</svg>

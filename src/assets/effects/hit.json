@@ -1,0 +1,10 @@
+{
+  "key": "feedback.hit.effect",
+  "kind": "burst",
+  "textureKey": "effect.hit.placeholder",
+  "durationMs": 500,
+  "scaleTo": 2,
+  "fadeOut": true,
+  "screenShake": { "durationMs": 180, "intensity": 0.006 },
+  "reducedMotion": { "scaleTo": 1, "screenShake": null, "durationMs": 400 }
+}

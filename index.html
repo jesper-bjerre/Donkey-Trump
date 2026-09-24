@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Donkey Trump: a browser-based retro arcade satire platformer." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Donkey Trump</title>
+  </head>
+  <body>
+    <main class="shell">
+      <h1 class="visually-hidden">Donkey Trump</h1>
+      <div id="game" class="game-host" aria-describedby="game-help"></div>
+      <p id="game-help" class="shell-help">
+        Keyboard game. Arrow keys to move and climb, Space to jump, Enter to select.
+      </p>
+      <div id="sr-status" class="visually-hidden" role="status" aria-live="polite"></div>
+      <noscript>Donkey Trump needs JavaScript enabled in a modern desktop browser.</noscript>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

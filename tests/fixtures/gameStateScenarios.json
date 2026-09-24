@@ -1,0 +1,24 @@
+{
+  "initialLives": 3,
+  "totalLevels": 3,
+  "scoringDeltas": { "barrelJump": 100, "levelComplete": 1000, "victoryLifeBonus": 500 },
+  "sequences": {
+    "startToPlay": { "actions": ["startGame"], "expectedState": "play" },
+    "pauseAndResume": { "actions": ["startGame", "pauseGame", "resumeGame"], "expectedState": "play" },
+    "lifeLoss": { "actions": ["startGame", "loseLife"], "expectedState": "life-loss", "expectedLives": 2 },
+    "lifeLossToRetry": { "actions": ["startGame", "loseLife", "retryLevel"], "expectedState": "retry" },
+    "retryToPlay": { "actions": ["startGame", "loseLife", "retryLevel", "startLevel"], "expectedState": "play", "expectedLives": 2 },
+    "levelComplete": { "actions": ["startGame", "completeLevel"], "expectedState": "level-complete", "expectedScore": 1000 },
+    "levelCompleteToPlay": { "actions": ["startGame", "completeLevel", "startNextLevel"], "expectedState": "play", "expectedLevelIndex": 1 },
+    "finalLevelToVictory": {
+      "actions": ["startGame", "completeLevel", "startNextLevel", "completeLevel", "startNextLevel", "completeFinalLevel"],
+      "expectedState": "victory",
+      "expectedScore": 4500
+    },
+    "gameOverToStart": {
+      "actions": ["startGame", "loseLife", "retryLevel", "startLevel", "loseLife", "retryLevel", "startLevel", "loseLife", "restartGame"],
+      "expectedState": "start",
+      "expectedLives": 3
+    }
+  }
+}

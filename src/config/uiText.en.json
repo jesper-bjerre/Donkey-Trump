@@ -1,0 +1,80 @@
+{
+  "title": {
+    "gameTitle": "DONKEY TRUMP",
+    "tagline": "Climb. Dodge. Rescue Motzfeldt.",
+    "start": "Start Game",
+    "instructions": "How to Play",
+    "privacy": "Privacy",
+    "accountFree": "No account needed. Just press Enter and play.",
+    "menuHint": "Up/Down to choose, Enter to select",
+    "parody": "An original satirical parody. Not affiliated with any game publisher."
+  },
+  "instructions": {
+    "heading": "How to Play",
+    "goal": "Climb the girders and reach Motzfeldt at the top. Dodge the barrels!",
+    "left": "Left Arrow or A: move left",
+    "right": "Right Arrow or D: move right",
+    "jump": "Space: jump over barrels",
+    "up": "Up Arrow or W: climb up a ladder",
+    "down": "Down Arrow or S: climb down a ladder",
+    "pause": "P: pause the game",
+    "resume": "P or Escape: resume while paused",
+    "retry": "Enter: retry after game over",
+    "ladderNote": "You cannot jump from one floor to the next. Use the ladders.",
+    "close": "Press Escape or Enter to close"
+  },
+  "privacy": {
+    "heading": "Privacy",
+    "local": "The game runs entirely in your browser.",
+    "noAccounts": "There are no accounts and no persistent profiles.",
+    "noAnalytics": "There are no third-party analytics, and analytics transmission is disabled for this launch.",
+    "noStorage": "Your score is kept in memory only and is gone when you close the page.",
+    "close": "Press Escape or Enter to close"
+  },
+  "hud": {
+    "score": "Score",
+    "lives": "Lives",
+    "level": "Level",
+    "objective": "Rescue Motzfeldt!"
+  },
+  "pause": {
+    "heading": "Paused",
+    "resume": "Resume",
+    "restart": "Restart from Level 1",
+    "returnToTitle": "Return to Title",
+    "helpHeading": "Controls",
+    "hint": "Up/Down to choose, Enter to select, Escape or P to resume"
+  },
+  "retry": {
+    "lifeLost": "Ouch! A barrel got you.",
+    "retrying": "Try again..."
+  },
+  "gameOver": {
+    "heading": "GAME OVER",
+    "finalScore": "Final score",
+    "retry": "Press Enter to play again",
+    "title": "Press Escape for the title screen"
+  },
+  "levelComplete": {
+    "heading": "Motzfeldt rescued!",
+    "next": "Get ready for the next level..."
+  },
+  "victory": {
+    "heading": "VICTORY!",
+    "message": "Jumpman Løkke rescued Motzfeldt from every level.",
+    "finalScore": "Final score",
+    "replay": "Press Enter to return to the title screen"
+  },
+  "loading": {
+    "preparing": "Preparing the game...",
+    "slow": "Still loading. Hang tight, the game is preparing."
+  },
+  "errors": {
+    "unsupportedBrowserTitle": "Browser not supported",
+    "unsupportedBrowser": "Donkey Trump needs a modern desktop browser with Canvas or WebGL rendering and keyboard support. Please try the latest Chrome, Edge, Firefox or Safari.",
+    "assetLoadFailureTitle": "Game files did not load",
+    "assetLoadFailure": "Some game files could not be loaded. Check your connection and reload the page.",
+    "reload": "Press Enter to reload",
+    "invalidLevelData": "This level could not be loaded. Please reload the page."
+  }
+}
